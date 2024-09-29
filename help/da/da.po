@@ -7,15 +7,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: baobab master\n"
-"POT-Creation-Date: 2020-12-28 21:39+0000\n"
-"PO-Revision-Date: 2020-12-30 00:00+0200\n"
-"Last-Translator: scootergrisen\n"
+"POT-Creation-Date: 2023-02-12 02:01+0000\n"
+"PO-Revision-Date: 2023-02-25 16:03+0100\n"
+"Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
 msgctxt "_"
@@ -39,49 +40,55 @@ msgctxt "link"
 msgid "Disk Usage Analyzer"
 msgstr "Diskforbrugsanalyse"
 
+#. (itstool) path: info/title
+#: C/index.page:9
+msgctxt "link:trail"
+msgid "Disk Usage Analyzer"
+msgstr "Diskforbrugsanalyse"
+
 #. (itstool) path: credit/name
-#: C/index.page:14 C/introduction.page:13 C/pref-view-chart.page:13
-#: C/scan-file-system.page:12 C/scan-folder.page:13 C/scan-home.page:13
-#: C/scan-remote.page:13
+#: C/index.page:15 C/introduction.page:13 C/pref-view-chart.page:14
+#: C/scan-file-system.page:13 C/scan-folder.page:14 C/scan-home.page:14
+#: C/scan-remote.page:14
 msgid "Julita Inca"
 msgstr "Julita Inca"
 
 #. (itstool) path: credit/name
-#: C/index.page:18 C/introduction.page:17 C/pref-view-chart.page:21
+#: C/index.page:19 C/introduction.page:17 C/pref-view-chart.page:22
 #: C/question-open-folder.page:11 C/question-trash.page:11
-#: C/scan-file-system.page:16 C/scan-folder.page:21 C/scan-home.page:17
-#: C/scan-remote.page:21
+#: C/scan-file-system.page:17 C/scan-folder.page:22 C/scan-home.page:18
+#: C/scan-remote.page:22
 msgid "Ekaterina Gerasimova"
 msgstr "Ekaterina Gerasimova"
 
 #. (itstool) path: info/desc
-#: C/index.page:24
+#: C/index.page:25
 msgid "<app>Disk Usage Analyzer</app> is a graphical storage device scanner."
 msgstr "<app>Diskforbrugsanalyse</app> er en grafisk lagerenhedsskanner."
 
 #. (itstool) path: page/title
-#: C/index.page:29
+#: C/index.page:30
 msgid "<_:media-1/> Disk Usage Analyzer"
 msgstr "<_:media-1/> Diskforbrugsanalyse"
 
 #. (itstool) path: section/title
-#: C/index.page:35
+#: C/index.page:37
 msgid "Scan"
 msgstr "Skan"
 
 #. (itstool) path: section/title
-#: C/index.page:39
+#: C/index.page:41
 msgid "Preferences"
 msgstr "Indstillinger"
 
 #. (itstool) path: section/title
-#: C/index.page:43
+#: C/index.page:45
 msgid "Common problems and questions"
 msgstr "Almindelige problemer og spørgsmål"
 
 #. (itstool) path: credit/name
-#: C/introduction.page:21 C/pref-view-chart.page:17 C/scan-file-system.page:20
-#: C/scan-folder.page:17 C/scan-home.page:21 C/scan-remote.page:17
+#: C/introduction.page:21 C/pref-view-chart.page:18 C/scan-file-system.page:21
+#: C/scan-folder.page:18 C/scan-home.page:22 C/scan-remote.page:18
 msgid "Michael Hill"
 msgstr "Michael Hill"
 
@@ -105,10 +112,11 @@ msgid ""
 "<app>Disk Usage Analyzer</app> is a graphical application for analysing "
 "storage device usage. It can be used to scan multiple local or remote "
 "storage devices, including hard disks, SSDs, USB sticks, digital cameras and "
-"memory cards. <app>Disk Usage Analyzer</app> can scan either the <link xref="
-"\"scan-file-system\">whole file system</link>, <link xref=\"scan-home\">your "
-"<file>Home</file> directory</link>, <link xref=\"scan-folder\">a specified "
-"folder</link> or <link xref=\"scan-remote\">a remote directory</link>."
+"memory cards. <app>Disk Usage Analyzer</app> can scan either the <link "
+"xref=\"scan-file-system\">whole file system</link>, <link xref=\"scan-"
+"home\">your <file>Home</file> directory</link>, <link xref=\"scan-folder\">a "
+"specified folder</link> or <link xref=\"scan-remote\">a remote directory</"
+"link>."
 msgstr ""
 "<app>Diskforbrugsanalyse</app> er et grafisk program til at analysere "
 "forbruget på lagerenheder. Det kan bruges til at skanne adskillige lokale "
@@ -122,31 +130,31 @@ msgstr ""
 #: C/introduction.page:42
 msgid ""
 "The results may be useful in deciding which folders can be <link href=\"help:"
-"file-roller\">archived</link>, <link href=\"help:gnome-help/files-delete"
-"\">deleted</link> or <link href=\"help:gnome-help/files-copy\">moved</link> "
-"to free up space. You can also use the results to estimate how much space "
-"would be needed for a <link href=\"help:gnome-help/backup-how\">backup</"
-"link> of specific folders."
+"file-roller\">archived</link>, <link href=\"help:gnome-help/files-"
+"delete\">deleted</link> or <link href=\"help:gnome-help/files-copy\">moved</"
+"link> to free up space. You can also use the results to estimate how much "
+"space would be needed for a <link href=\"help:gnome-help/backup-"
+"how\">backup</link> of specific folders."
 msgstr ""
 "Resultaterne kan være nyttige til at beslutte hvilke mapper der kan <link "
 "href=\"help:file-roller\">arkiveres</link>, <link href=\"help:gnome-help/"
-"files-delete\">slettes</link> eller <link href=\"help:gnome-help/files-copy"
-"\">flyttes</link>, for at frigøre plads. Du kan også bruge resultaterne til "
-"at vurdere hvor meget plads der kræves for at <link href=\"help:gnome-help/"
-"backup-how\">sikkerhedskopiere</link> bestemte mapper."
+"files-delete\">slettes</link> eller <link href=\"help:gnome-help/files-"
+"copy\">flyttes</link>, for at frigøre plads. Du kan også bruge resultaterne "
+"til at vurdere hvor meget plads der kræves for at <link href=\"help:gnome-"
+"help/backup-how\">sikkerhedskopiere</link> bestemte mapper."
 
 #. (itstool) path: info/desc
-#: C/pref-view-chart.page:27
+#: C/pref-view-chart.page:28
 msgid "Display the results as a ring chart or a treemap chart."
 msgstr "Vis resultaterne som et cirkeldiagram eller et trækortdiagram."
 
 #. (itstool) path: page/title
-#: C/pref-view-chart.page:31
+#: C/pref-view-chart.page:32
 msgid "Different chart views"
 msgstr "Forskellige diagramvisninger"
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:33
+#: C/pref-view-chart.page:34
 msgid ""
 "By default, the scan results show each subfolder as the section of a ring, "
 "comprising an angle proportional to the size of the relevant folder. Sub-"
@@ -159,7 +167,7 @@ msgstr ""
 "cirkel."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:37
+#: C/pref-view-chart.page:38
 msgid ""
 "Moving your mouse over the rings chart displays more details about the "
 "folder and subfolders."
@@ -168,18 +176,18 @@ msgstr ""
 "mappen og undermapperne."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:39
+#: C/pref-view-chart.page:40
 msgid ""
-"Chart visibility can be changed to <gui>Treemap View</gui> using the buttons "
-"at the bottom of the chart, on the right-hand side. The tree layout displays "
-"the folders as proportionately sized boxes."
+"Chart visibility can be changed to <gui>Treemap Chart</gui> using the "
+"buttons at the bottom of the chart, on the right-hand side. The tree layout "
+"displays the folders as proportionately sized boxes."
 msgstr ""
-"Diagrammets synlighed kan ændres til <gui>Trækortvisning</gui> med knapperne "
+"Diagrammets synlighed kan ændres til <gui>Trækortdiagram</gui> med knapperne "
 "i bunden af diagrammet, i højre side. Trælayoutet viser forholdsmæssigt "
 "mappernes størrelse som bokse."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:42
+#: C/pref-view-chart.page:43
 msgid ""
 "You can also click on a ring or box to make that the starting point of the "
 "chart."
@@ -219,9 +227,9 @@ msgid ""
 "folders it contains</gui> at the top of <app>Disk Usage Analyzer</app> "
 "window. This error appears because you don't have the required permissions "
 "to access some files due to restrictions set on the target system. The files "
-"you can't access won't be used to compute the <link xref=\"pref-view-chart"
-"\">chart</link> representing the disk usage, hence the result reported may "
-"be wrong."
+"you can't access won't be used to compute the <link xref=\"pref-view-"
+"chart\">chart</link> representing the disk usage, hence the result reported "
+"may be wrong."
 msgstr ""
 "Under skanning ser du måske meddelelsen <gui>Kunne ikke skanne /… eller "
 "visse af mapperne indeholdt i</gui> øverst i vinduet "
@@ -314,9 +322,9 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/question-open-folder.page:29
 msgid ""
-"Right-click on the folder that you want to open and select <gui>Open Folder</"
-"gui>."
-msgstr "Højreklik på den mappe, du vil åbne, og vælg <gui>Åbn mappe</gui>."
+"Right-click on the folder that you want to open and select <gui>Open "
+"Externally</gui>."
+msgstr "Højreklik på den mappe, du vil åbne, og vælg <gui>Åbn eksternt</gui>."
 
 #. (itstool) path: info/desc
 #: C/question-trash.page:18
@@ -356,30 +364,32 @@ msgstr ""
 "Åbn en filbrowser såsom <app>Filer</app> og tøm <file>Papirkurv</file>."
 
 #. (itstool) path: info/desc
-#: C/scan-file-system.page:26
+#: C/scan-file-system.page:27
 msgid "Scan your internal storage devices."
 msgstr "Skan dine interne lagerenheder."
 
 #. (itstool) path: page/title
-#: C/scan-file-system.page:30
+#: C/scan-file-system.page:31
 msgid "Scan the file system"
 msgstr "Skan filsystemet"
 
+# Der er både en Devices and Locations og en Devices & Locations i po'en for programmet
 #. (itstool) path: page/p
-#: C/scan-file-system.page:32
+#: C/scan-file-system.page:33
 msgid ""
 "To scan your computer, select the name of your computer from the list of "
-"<gui>Devices and locations</gui>. All of the folders that you have "
+"<gui>Devices &amp; Locations</gui>. All of the folders that you have "
 "permission to access on your computer will be scanned. It is quite common "
 "for you to not have permissions to scan some directories on your computer."
 msgstr ""
-"For at skanne din computer, vælges navnet på din computer fra listen med "
-"<gui>Enheder og steder</gui>. Alle de mapper som du har adgangsrettigheder "
-"til på din computer vil blive skannet. Det er helt normalt at du ikke har "
-"rettigheder til at skanne nogle af mapperne på din computer."
+"For at skanne din computer vælges navnet på din computer fra listen med "
+"<gui>Enheder &amp; steder</gui>. Alle de mapper, som du har "
+"adgangsrettigheder til på din computer, vil blive skannet. Det er helt "
+"normalt, at du ikke har rettigheder til at skanne nogle af mapperne på din "
+"computer."
 
 #. (itstool) path: note/p
-#: C/scan-file-system.page:38
+#: C/scan-file-system.page:39
 msgid ""
 "If the file system that you are trying to scan is large, it may take a few "
 "minutes for the scan to complete. To cancel the scan, press the button in "
@@ -391,17 +401,17 @@ msgstr ""
 "med enheder."
 
 #. (itstool) path: info/desc
-#: C/scan-folder.page:27
+#: C/scan-folder.page:28
 msgid "Scan a local folder, including all subfolders."
 msgstr "Skan en lokal mappe, inklusive alle undermapper."
 
 #. (itstool) path: page/title
-#: C/scan-folder.page:31
+#: C/scan-folder.page:32
 msgid "Scan a folder"
 msgstr "Skan en mappe"
 
 #. (itstool) path: page/p
-#: C/scan-folder.page:33
+#: C/scan-folder.page:34
 msgid ""
 "Scans of individual folders are faster than those of the whole file system, "
 "so they may be more efficient if you want information only about a specific "
@@ -412,50 +422,50 @@ msgstr ""
 "bestemt del af dit filsystem."
 
 #. (itstool) path: item/p
-#: C/scan-folder.page:39
+#: C/scan-folder.page:40
 msgid ""
-"Press the button in the top-right of the main window and select <gui style="
-"\"menuitem\">Scan Folder…</gui>."
+"Press the button in the top-right of the main window and select <gui "
+"style=\"menuitem\">Scan Folder…</gui>."
 msgstr ""
-"Tryk på knappen øverst til højre i hovedvinduet og vælg <gui style=\"menuitem"
-"\">Skan mappe…</gui>."
+"Tryk på knappen øverst til højre i hovedvinduet og vælg <gui "
+"style=\"menuitem\">Skan mappe…</gui>."
 
 #. (itstool) path: item/p
-#: C/scan-folder.page:43
+#: C/scan-folder.page:44
 msgid ""
 "A file chooser dialog will open. Choose the folder which you want to scan."
 msgstr "En filvælgerdialog åbnes. Vælg den mappe, du vil skanne."
 
 #. (itstool) path: item/p
-#: C/scan-folder.page:47
+#: C/scan-folder.page:48
 msgid "Click <gui>Open</gui> to start the scan."
 msgstr "Klik på <gui>Åbn</gui> for at starte skanningen."
 
 #. (itstool) path: page/p
-#: C/scan-folder.page:51
+#: C/scan-folder.page:52
 msgid ""
 "The folder which you just scanned will now be added to your list of "
-"<gui>Devices and locations</gui>. If the folder is renamed or deleted, it "
+"<gui>Devices &amp; Locations</gui>. If the folder is renamed or deleted, it "
 "will be removed from the list when you next restart <app>Disk Usage "
 "Analyzer</app>."
 msgstr ""
 "Den mappe, du lige har skannet, vil nu blive tilføjet til din liste med "
-"<gui>Enheder og steder</gui>. Hvis mappen omdøbes eller slettes, vil den "
-"blive fjernet fra listen næste gang du genstarter <app>Diskforbrugsanalyse</"
+"<gui>Enheder &amp; steder</gui>. Hvis mappen omdøbes eller slettes, vil den "
+"blive fjernet fra listen næste gang, du genstarter <app>Diskforbrugsanalyse</"
 "app>."
 
 #. (itstool) path: info/desc
-#: C/scan-home.page:27
+#: C/scan-home.page:28
 msgid "Scan all of your personal files that are on your computer."
 msgstr "Skan alle dine personlige filer som er på din computer."
 
 #. (itstool) path: page/title
-#: C/scan-home.page:31
+#: C/scan-home.page:32
 msgid "Scan your <file>Home</file> folder"
 msgstr "Skan din <file>Hjem</file>-mappe"
 
 #. (itstool) path: page/p
-#: C/scan-home.page:33
+#: C/scan-home.page:34
 msgid ""
 "The <file>Home</file> folder is where most files are located for most users "
 "because default settings are often set to save or copy files into "
@@ -470,25 +480,25 @@ msgstr ""
 "Normalt har hver bruger en <file>Hjem</file>-mappe på computeren."
 
 #. (itstool) path: item/p
-#: C/scan-home.page:41
+#: C/scan-home.page:42
 msgid ""
-"Select your <gui>Home folder</gui> in the list of <gui>Devices and "
-"locations</gui>."
+"Select your <gui>Home Folder</gui> in the list of <gui>Devices &amp; "
+"Locations</gui>."
 msgstr ""
-"Vælg din <gui>Hjemmemappe</gui> i listen med <gui>Enheder og steder</gui>."
+"Vælg din <gui>Hjemmemappe</gui> i listen med <gui>Enheder &amp; steder</gui>."
 
 #. (itstool) path: info/desc
-#: C/scan-remote.page:27
+#: C/scan-remote.page:28
 msgid "Scan a folder remotely from your computer."
 msgstr "Skan en mappe på et fjernsted fra din computer."
 
 #. (itstool) path: page/title
-#: C/scan-remote.page:31
+#: C/scan-remote.page:32
 msgid "Scan a remote folder"
 msgstr "Skan en fjernmappe"
 
 #. (itstool) path: page/p
-#: C/scan-remote.page:33
+#: C/scan-remote.page:34
 msgid ""
 "<app>Disk Usage Analyzer</app> can scan storage devices which are accessible "
 "remotely. To scan the whole file system or any specific folder remotely:"
@@ -497,29 +507,42 @@ msgstr ""
 "Sådan skannes hele filsystemet eller en bestemt mappe på et fjernsted:"
 
 #. (itstool) path: item/p
-#: C/scan-remote.page:39
+#: C/scan-remote.page:40
 msgid ""
-"Press the button in the top-right of the main window and select <gui style="
-"\"menuitem\">Scan Remote Folder…</gui>."
+"If you have scanned the remote file system before, select it under "
+"<gui>Remote Locations</gui> in the list of <gui>Devices &amp; Locations</"
+"gui>."
 msgstr ""
-"Tryk på knappen øverst til højre i hovedvinduet og vælg <gui style=\"menuitem"
-"\">Skan fjernmappe…</gui>."
+"Har du skannet fjernfilsystemet før, så vælg det under <gui>Fjernsteder</"
+"gui> i listen med <gui>Enheder &amp; steder</gui>."
 
 #. (itstool) path: item/p
-#: C/scan-remote.page:43
+#: C/scan-remote.page:45
 msgid ""
-"Enter the URL into the <gui>Server Address</gui> field. It will normally "
-"have a protocol, followed by a colon and two slashes, that looks different "
-"depending on the <link xref=\"help:gnome-help/nautilus-connect#types"
-"\">protocol</link> that you are using."
+"If you have connected to the remote file system before but not scanned it, "
+"select the remote file system from the list."
 msgstr ""
-"Indtast URL'en i feltet <gui>Serveradresse</gui>. Den har normalt en "
-"protokol, efterfulgt af et kolon og to skråstreger. URL'en ser forskellig ud "
-"afhængig af hvilken <link xref=\"help:gnome-help/nautilus-connect#types"
-"\">protokol</link>, du bruger."
+"Har du været forbundet til fjernfilsystemet før, men ikke skannet det, så "
+"vælg fjernfilsystemet i listen."
+
+# Connect to server findes ikke i programmets po
+#. (itstool) path: item/p
+#: C/scan-remote.page:49
+msgid ""
+"If you have not connected to the remote file system before, enter the URL "
+"into the <gui>Enter server address…</gui> field under <gui>Connect to "
+"Server</gui>. It will normally have a protocol, followed by a colon and two "
+"slashes, that looks different depending on the <link xref=\"help:gnome-help/"
+"nautilus-connect#types\">protocol</link> that you are using."
+msgstr ""
+"Har du ikke været forbundet til fjernfilsystemet før, så indtast URL'en i "
+"feltet <gui>Indtast serveradresse …</gui> under <gui>Tilslut til server</"
+"gui>. Den har normalt en protokol, efterfulgt af et kolon og to skråstreger. "
+"URL'en ser forskellig ud afhængig af hvilken <link xref=\"help:gnome-help/"
+"nautilus-connect#types\">protokol</link>, du bruger."
 
 #. (itstool) path: item/p
-#: C/scan-remote.page:50
+#: C/scan-remote.page:55
 msgid ""
 "Click <gui>Connect</gui> to continue; you may be asked for more details, "
 "like a password and username, before the scan will commence."
@@ -527,26 +550,23 @@ msgstr ""
 "Klik på <gui>Tilslut</gui> for at fortsætte; du kan blive spurgt om flere "
 "detaljer, såsom en adgangskode og brugernavn, før skanningen starter."
 
+#. (itstool) path: item/p
+#: C/scan-remote.page:59
+msgid "Select a folder if you do not want to scan the complete file system."
+msgstr "Vælg en mappe, hvis du ikke vil skanne hele filsystemet."
+
+#. (itstool) path: item/p
+#: C/scan-remote.page:62
+msgid "Click <gui>Open</gui> to continue."
+msgstr "Klik på <gui>Åbn</gui> for at fortsætte."
+
 #. (itstool) path: note/p
-#: C/scan-remote.page:56
+#: C/scan-remote.page:67
 msgid ""
 "Scanning over the network may be slower than scanning a local file system."
 msgstr ""
 "Skanning over netværket kan være langsommere end skanning på et lokalt "
 "filsystem."
-
-#. (itstool) path: page/p
-#: C/scan-remote.page:60
-msgid ""
-"You can also select a recently used server instead of entering a new URL. If "
-"you enter a URL which is not valid, you will not be able to press "
-"<gui>Continue</gui>, but if the URL is valid, but incorrect, the connection "
-"will fail without warnings."
-msgstr ""
-"Du kan også vælge en af de senest anvendte servere i stedet for at indtaste "
-"en ny URL. Hvis du indtaster en ugyldig URL, kan du ikke trykke på "
-"<gui>Fortsæt</gui>, men hvis URL'en er gyldig, men forkert, vil forbindelsen "
-"mislykkes uden advarsler."
 
 #. (itstool) path: p/link
 #: C/legal.xml:5
@@ -558,3 +578,21 @@ msgstr ""
 #: C/legal.xml:4
 msgid "This work is licensed under a <_:link-1/>."
 msgstr "Værket er licenseret under en <_:link-1/>."
+
+#~ msgid ""
+#~ "Press the button in the top-right of the main window and select <gui "
+#~ "style=\"menuitem\">Scan Remote Folder…</gui>."
+#~ msgstr ""
+#~ "Tryk på knappen øverst til højre i hovedvinduet og vælg <gui "
+#~ "style=\"menuitem\">Skan fjernmappe…</gui>."
+
+#~ msgid ""
+#~ "You can also select a recently used server instead of entering a new URL. "
+#~ "If you enter a URL which is not valid, you will not be able to press "
+#~ "<gui>Continue</gui>, but if the URL is valid, but incorrect, the "
+#~ "connection will fail without warnings."
+#~ msgstr ""
+#~ "Du kan også vælge en af de senest anvendte servere i stedet for at "
+#~ "indtaste en ny URL. Hvis du indtaster en ugyldig URL, kan du ikke trykke "
+#~ "på <gui>Fortsæt</gui>, men hvis URL'en er gyldig, men forkert, vil "
+#~ "forbindelsen mislykkes uden advarsler."

@@ -1,8 +1,8 @@
 project(
   'baobab', ['vala', 'c'],
-  version: '41.0',
+  version: '47.0',
   license: 'GPL2+',
-  meson_version: '>= 0.50.0',
+  meson_version: '>= 0.59.0',
 )
 
 gnome = import('gnome')
@@ -12,8 +12,8 @@ python = import('python')
 glib = dependency('glib-2.0', version: '>=2.44')
 gio = dependency('gio-2.0', version: '>=2.44')
 gobject = dependency('gobject-2.0', version: '>=2.44')
-gtk = dependency('gtk+-3.0', version: '>=3.24.1')
-libhandy = dependency('libhandy-1', version: '>=1.0.0')
+gtk = dependency('gtk4', version: '>=4.15.1')
+libhandy = dependency('libadwaita-1', version: '>=1.6.alpha')
 
 cc = meson.get_compiler('c')
 math = cc.find_library('m', required: false)
@@ -25,8 +25,16 @@ conf.set_quoted('GNOMELOCALEDIR', join_paths(get_option('prefix'), get_option('l
 configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
 
-meson.add_install_script(python.find_installation('python3').path(),
-  join_paths(meson.source_root(), 'build-aux', 'post-install.py'))
+gnome.post_install(
+  glib_compile_schemas: true,
+  gtk_update_icon_cache: true,
+  update_desktop_database: true,
+)
+
+add_project_arguments(
+  '--disable-since-check',
+  language: 'vala'
+)
 
 subdir('data')
 subdir('help')

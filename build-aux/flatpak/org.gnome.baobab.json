@@ -20,7 +20,8 @@
         "--talk-name=org.gtk.vfs",
         "--talk-name=org.gtk.vfs.*",
         "--system-talk-name=org.freedesktop.hostname1",
-        "--share=network"
+        "--share=network",
+        "--device=dri"
     ],
     "build-options" : {
         "cflags" : "-O2 -g",
@@ -50,7 +51,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "https://gitlab.gnome.org/GNOME/baobab.git"
+                    "url" : "https://gitlab.gnome.org/GNOME/baobab.git",
+                    "branch" : "main"
                 }
             ]
         }

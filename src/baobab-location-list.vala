@@ -40,7 +40,7 @@ namespace Baobab {
         public LocationRow (Location l) {
             location = l;
 
-            image.gicon = location.icon;
+            image.gicon = location.symbolic_icon;
 
             var escaped = Markup.escape_text (location.name);
             name_label.label = "<b>%s</b>".printf (escaped);
@@ -68,13 +68,14 @@ namespace Baobab {
                     total_size_label.show();
 
                     if (location.used != null) {
-                        available_label.label = _("%s Available").printf (format_size (location.size - location.used));
+                        var actually_used = location.used + (location.reserved ?? 0);
+                        available_label.label = _("%s Available").printf (format_size (location.size - actually_used));
 
                         usage_bar.max_value = location.size;
 
                         // Set critical color at 90% of the size
                         usage_bar.add_offset_value (Gtk.LEVEL_BAR_OFFSET_LOW, 0.9 * location.size);
-                        usage_bar.value = location.used;
+                        usage_bar.value = actually_used;
                         usage_bar.show ();
                     } else {
                         available_label.label = _("Unknown");
@@ -91,13 +92,13 @@ namespace Baobab {
     }
 
     [GtkTemplate (ui = "/org/gnome/baobab/ui/baobab-location-list.ui")]
-    public class LocationList : Gtk.Box {
+    public class LocationList : Adw.PreferencesPage {
         [GtkChild]
         private unowned Gtk.ListBox local_list_box;
         [GtkChild]
         private unowned Gtk.ListBox remote_list_box;
         [GtkChild]
-        private unowned Gtk.Box remote_box;
+        private unowned Adw.PreferencesGroup remote_group;
 
         public signal void location_activated (Location location);
 
@@ -250,7 +251,7 @@ namespace Baobab {
             }
 
             recent_items.sort ((a, b) => {
-                return (int)(b.get_modified () - a.get_modified ());
+                return (int)(b.get_modified ().difference (a.get_modified ()));
             });
 
             unowned List<Gtk.RecentInfo> last = recent_items.nth (MAX_RECENT_LOCATIONS - 1);
@@ -269,17 +270,22 @@ namespace Baobab {
         }
 
         public void update () {
-            local_list_box.foreach ((widget) => { widget.destroy (); });
-            remote_list_box.foreach ((widget) => { widget.destroy (); });
+            for (Gtk.Widget? child = local_list_box.get_first_child (); child != null; child = local_list_box.get_first_child ()) {
+                local_list_box.remove (child);
+            }
 
-            remote_box.visible = false;
+            for (Gtk.Widget? child = remote_list_box.get_first_child (); child != null; child = remote_list_box.get_first_child ()) {
+                remote_list_box.remove (child);
+            }
+
+            remote_group.visible = false;
 
             foreach (var location in locations) {
                 if (location.is_remote) {
-                    remote_list_box.add (new LocationRow (location));
-                    remote_box.visible = true;
+                    remote_list_box.append (new LocationRow (location));
+                    remote_group.visible = true;
                 } else {
-                    local_list_box.add (new LocationRow (location));
+                    local_list_box.append (new LocationRow (location));
                 }
             }
         }

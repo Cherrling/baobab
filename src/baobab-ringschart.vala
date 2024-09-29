@@ -98,7 +98,6 @@ namespace Baobab {
             }
 
             var context = get_style_context ();
-            var context_state = context.get_state ();
             context.save ();
             context.add_class ("subfolder-tip");
 
@@ -111,7 +110,7 @@ namespace Baobab {
 
             Gdk.Rectangle last_rect = Gdk.Rectangle ();
 
-            var padding = context.get_padding (context_state);
+            var padding = context.get_padding ();
             var vpadding = padding.top + padding.bottom;
             var hpadding = padding.left + padding.right;
 
@@ -129,7 +128,7 @@ namespace Baobab {
 
                 // get the pango layout and its enclosing rectangle
                 var layout = create_pango_layout (null);
-                var markup = "<span size=\"small\">" + Markup.escape_text (item.name) + "</span>";
+                var markup = "<span size=\"small\">" + Markup.escape_text (item.results.display_name) + "</span>";
                 layout.set_markup (markup, -1);
                 layout.set_indent (0);
                 layout.set_spacing (0);
@@ -198,8 +197,7 @@ namespace Baobab {
                     cr.rectangle (tooltip_rect.x + tooltip_rect.width, tooltip_rect.y, -tooltip_rect.width, tooltip_rect.height);
                     cr.clip ();
 
-                    Gdk.RGBA bg_color;
-                    context.lookup_color ("tooltip_bg_color", out bg_color);
+                    Gdk.RGBA bg_color = { 0, 0, 0, (float) 0.8 };
                     cr.set_line_width (1);
                     cr.move_to (sector_center_x, sector_center_y);
                     Gdk.cairo_set_source_rgba (cr, bg_color);
@@ -254,7 +252,8 @@ namespace Baobab {
                 // draw a label with the size of the folder in the middle
                 // of the central disk
                 var layout = create_pango_layout (null);
-                var markup = "<span size=\"small\">" + Markup.escape_text (item.size) + "</span>";
+                var size = format_size (item.results.size);
+                var markup = "<span size=\"small\">" + Markup.escape_text (size) + "</span>";
                 layout.set_markup (markup, -1);
                 layout.set_indent (0);
                 layout.set_spacing (0);
@@ -303,9 +302,7 @@ namespace Baobab {
             get_allocation (out allocation);
 
             var context = get_style_context ();
-            var context_state = context.get_state ();
-
-            var padding = context.get_padding (context_state);
+            var padding = context.get_padding ();
             var max_radius = int.min (allocation.width / 2, allocation.height / 2) - padding.left; // Assuming that padding is the same for all sides
             var thickness = max_radius / (max_depth + 1);
 
@@ -329,7 +326,7 @@ namespace Baobab {
                 }
 
                 ringsitem.start_angle = parent.start_angle + parent.angle * ringsitem.rel_start / 100;
-                ringsitem.continued = (ringsitem.has_any_child) && (ringsitem.depth == max_depth);
+                ringsitem.continued = (!ringsitem.results.is_empty) && (ringsitem.depth == max_depth);
                 parent.has_visible_children = true;
             }
 

@@ -1,17 +1,17 @@
 # Hungarian translation for baobab_help.
-# Copyright (C) 2012, 2013, 2014, 2020, 2021. Free Software Foundation, Inc.
+# Copyright (C) 2012, 2013, 2014, 2020, 2021, 2022, 2023 Free Software Foundation, Inc.
 # This file is distributed under the same license as the baobab help.
 #
 # Gabor Kelemen <kelemeng at gnome dot hu>, 2012, 2013, 2014, 2015, 2017.
 # Bence Lukacs <lukacs.bence1 at gmail dot com>, 2012.
 # Attila Hammer <hammera at pickup dot hu>, 2014.
-# Balázs Úr <ur.balazs at fsf dot hu>, 2020, 2021.
+# Balázs Úr <ur.balazs at fsf dot hu>, 2020, 2021, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: baobab master\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2021-07-13 18:36+0000\n"
-"PO-Revision-Date: 2021-09-12 21:10+0200\n"
+"POT-Creation-Date: 2023-02-12 02:01+0000\n"
+"PO-Revision-Date: 2023-03-08 14:30+0100\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
 "Language: hu\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2012-03-04 15:16+0000\n"
-"X-Generator: Lokalize 19.12.3\n"
+"X-Generator: Lokalize 22.08.2\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
@@ -28,7 +28,7 @@ msgid "translator-credits"
 msgstr ""
 "Kelemen Gábor <kelemeng at gnome dot hu>, 2012, 2013, 2014\n"
 "Lukács Bence <lukacs.bence1 at gmail dot com>, 2012\n"
-"Attila Hammer <hammera at pickup dot hu>, 2014."
+"Hammer Attila <hammera at pickup dot hu>, 2014."
 
 #. (itstool) path: info/title
 #: C/index.page:7
@@ -42,15 +42,23 @@ msgctxt "link"
 msgid "Disk Usage Analyzer"
 msgstr "Lemezhasználat-elemző"
 
+#. (itstool) path: info/title
+#: C/index.page:9
+#| msgctxt "link"
+#| msgid "Disk Usage Analyzer"
+msgctxt "link:trail"
+msgid "Disk Usage Analyzer"
+msgstr "Lemezhasználat-elemző"
+
 #. (itstool) path: credit/name
-#: C/index.page:14 C/introduction.page:13 C/pref-view-chart.page:13
+#: C/index.page:15 C/introduction.page:13 C/pref-view-chart.page:14
 #: C/scan-file-system.page:13 C/scan-folder.page:14 C/scan-home.page:14
 #: C/scan-remote.page:14
 msgid "Julita Inca"
 msgstr "Julita Inca"
 
 #. (itstool) path: credit/name
-#: C/index.page:18 C/introduction.page:17 C/pref-view-chart.page:21
+#: C/index.page:19 C/introduction.page:17 C/pref-view-chart.page:22
 #: C/question-open-folder.page:11 C/question-trash.page:11
 #: C/scan-file-system.page:17 C/scan-folder.page:22 C/scan-home.page:18
 #: C/scan-remote.page:22
@@ -58,32 +66,32 @@ msgid "Ekaterina Gerasimova"
 msgstr "Ekaterina Gerasimova"
 
 #. (itstool) path: info/desc
-#: C/index.page:24
+#: C/index.page:25
 msgid "<app>Disk Usage Analyzer</app> is a graphical storage device scanner."
 msgstr "A <app>Lemezhasználat-elemző</app> egy grafikus háttértároló-vizsgáló."
 
 #. (itstool) path: page/title
-#: C/index.page:29
+#: C/index.page:30
 msgid "<_:media-1/> Disk Usage Analyzer"
 msgstr "<_:media-1/> Lemezhasználat-elemző"
 
 #. (itstool) path: section/title
-#: C/index.page:35
+#: C/index.page:37
 msgid "Scan"
 msgstr "Vizsgálat"
 
 #. (itstool) path: section/title
-#: C/index.page:39
+#: C/index.page:41
 msgid "Preferences"
 msgstr "Beállítások"
 
 #. (itstool) path: section/title
-#: C/index.page:43
+#: C/index.page:45
 msgid "Common problems and questions"
 msgstr "Gyakori problémák és kérdések"
 
 #. (itstool) path: credit/name
-#: C/introduction.page:21 C/pref-view-chart.page:17 C/scan-file-system.page:21
+#: C/introduction.page:21 C/pref-view-chart.page:18 C/scan-file-system.page:21
 #: C/scan-folder.page:18 C/scan-home.page:22 C/scan-remote.page:18
 msgid "Michael Hill"
 msgstr "Michael Hill"
@@ -140,17 +148,17 @@ msgstr ""
 "gnome-help/backup-how\">biztonsági mentéséhez</link>."
 
 #. (itstool) path: info/desc
-#: C/pref-view-chart.page:27
+#: C/pref-view-chart.page:28
 msgid "Display the results as a ring chart or a treemap chart."
 msgstr "Az eredmények megjelenítése gyűrűdiagramként vagy fadiagramként."
 
 #. (itstool) path: page/title
-#: C/pref-view-chart.page:31
+#: C/pref-view-chart.page:32
 msgid "Different chart views"
 msgstr "Különböző diagramnézetek"
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:33
+#: C/pref-view-chart.page:34
 msgid ""
 "By default, the scan results show each subfolder as the section of a ring, "
 "comprising an angle proportional to the size of the relevant folder. Sub-"
@@ -162,7 +170,7 @@ msgstr ""
 "különböző színekkel jelennek meg, a belső gyűrű körüli további rétegekként."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:37
+#: C/pref-view-chart.page:38
 msgid ""
 "Moving your mouse over the rings chart displays more details about the "
 "folder and subfolders."
@@ -171,18 +179,18 @@ msgstr ""
 "a gyűrűdiagram részei fölé."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:39
+#: C/pref-view-chart.page:40
 msgid ""
-"Chart visibility can be changed to <gui>Treemap View</gui> using the buttons "
-"at the bottom of the chart, on the right-hand side. The tree layout displays "
-"the folders as proportionately sized boxes."
+"Chart visibility can be changed to <gui>Treemap Chart</gui> using the "
+"buttons at the bottom of the chart, on the right-hand side. The tree layout "
+"displays the folders as proportionately sized boxes."
 msgstr ""
-"A diagram típusa megváltoztatható, ha a <gui>Megjelenítés fadiagramként</"
-"gui> opciót választja a diagram alatti gombokkal a jobb oldalon. A fadiagram "
-"a mappákat a méretükkel arányos négyzetekkel jeleníti meg."
+"A diagram típusa megváltoztatható <gui>Fadiagramra</gui> a diagram alatti, "
+"jobb oldalon lévő gombok használatával. A fadiagram a mappákat a méretükkel "
+"arányos dobozokkal jeleníti meg."
 
 #. (itstool) path: page/p
-#: C/pref-view-chart.page:42
+#: C/pref-view-chart.page:43
 msgid ""
 "You can also click on a ring or box to make that the starting point of the "
 "chart."
@@ -320,12 +328,15 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/question-open-folder.page:29
+#| msgid ""
+#| "Right-click on the folder that you want to open and select <gui>Open "
+#| "Folder</gui>."
 msgid ""
-"Right-click on the folder that you want to open and select <gui>Open Folder</"
-"gui>."
+"Right-click on the folder that you want to open and select <gui>Open "
+"Externally</gui>."
 msgstr ""
-"Kattintson a jobb egérgombbal a megnyitni kívánt mappára, és válassza a "
-"<gui>Mappa megnyitása</gui> menüpontot."
+"Kattintson a jobb egérgombbal a megnyitni kívánt mappára, és válassza a <gui"
+">Megnyitás külsőleg</gui> menüpontot."
 
 #. (itstool) path: info/desc
 #: C/question-trash.page:18
@@ -377,11 +388,6 @@ msgstr "A fájlrendszer vizsgálata"
 
 #. (itstool) path: page/p
 #: C/scan-file-system.page:33
-#| msgid ""
-#| "To scan your computer, select the name of your computer from the list of "
-#| "<gui>Devices and locations</gui>. All of the folders that you have "
-#| "permission to access on your computer will be scanned. It is quite common "
-#| "for you to not have permissions to scan some directories on your computer."
 msgid ""
 "To scan your computer, select the name of your computer from the list of "
 "<gui>Devices &amp; Locations</gui>. All of the folders that you have "
@@ -448,11 +454,6 @@ msgstr "Kattintson a <gui>Megnyitás</gui> menüpontra a vizsgálat elkezdéséh
 
 #. (itstool) path: page/p
 #: C/scan-folder.page:52
-#| msgid ""
-#| "The folder which you just scanned will now be added to your list of "
-#| "<gui>Devices and locations</gui>. If the folder is renamed or deleted, it "
-#| "will be removed from the list when you next restart <app>Disk Usage "
-#| "Analyzer</app>."
 msgid ""
 "The folder which you just scanned will now be added to your list of "
 "<gui>Devices &amp; Locations</gui>. If the folder is renamed or deleted, it "
@@ -491,9 +492,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/scan-home.page:42
-#| msgid ""
-#| "Select your <gui>Home folder</gui> in the list of <gui>Devices and "
-#| "locations</gui>."
 msgid ""
 "Select your <gui>Home Folder</gui> in the list of <gui>Devices &amp; "
 "Locations</gui>."
@@ -522,16 +520,13 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/scan-remote.page:40
-#| msgid ""
-#| "Select your <gui>Home folder</gui> in the list of <gui>Devices and "
-#| "locations</gui>."
 msgid ""
 "If you have scanned the remote file system before, select it under "
 "<gui>Remote Locations</gui> in the list of <gui>Devices &amp; Locations</"
 "gui>."
 msgstr ""
-"Ha korábban már ellenőrizte a távoli fájlrendszert, akkor válassza ki a <gui"
-">Távoli helyek</gui> alatt az <gui>Eszközök és helyek</gui> listából."
+"Ha korábban már ellenőrizte a távoli fájlrendszert, akkor válassza ki a "
+"<gui>Távoli helyek</gui> alatt az <gui>Eszközök és helyek</gui> listából."
 
 #. (itstool) path: item/p
 #: C/scan-remote.page:45
@@ -539,16 +534,11 @@ msgid ""
 "If you have connected to the remote file system before but not scanned it, "
 "select the remote file system from the list."
 msgstr ""
-"Ha korábban már kapcsolódott a távoli fájlrendszerhez, de még nem vizsgálta"
-" meg azt, akkor válassza ki a távoli fájlrendszert a listából."
+"Ha korábban már kapcsolódott a távoli fájlrendszerhez, de még nem vizsgálta "
+"meg azt, akkor válassza ki a távoli fájlrendszert a listából."
 
 #. (itstool) path: item/p
 #: C/scan-remote.page:49
-#| msgid ""
-#| "Enter the URL into the <gui>Server Address</gui> field. It will normally "
-#| "have a protocol, followed by a colon and two slashes, that looks "
-#| "different depending on the <link xref=\"help:gnome-help/nautilus-"
-#| "connect#types\">protocol</link> that you are using."
 msgid ""
 "If you have not connected to the remote file system before, enter the URL "
 "into the <gui>Enter server address…</gui> field under <gui>Connect to "
@@ -556,11 +546,11 @@ msgid ""
 "slashes, that looks different depending on the <link xref=\"help:gnome-help/"
 "nautilus-connect#types\">protocol</link> that you are using."
 msgstr ""
-"Ha korábban még nem kapcsolódott a távoli fájlrendszerhez, akkor írja be az"
-" URL-t a <gui>Kiszolgáló címének megadása…</gui> mezőbe a <gui>Kapcsolódás"
-" kiszolgálóhoz</gui> alatt. Ez általában egy protokollból, kettőspontból, két"
-" osztásjelből áll. Ez a formátum eltérhet, a használt <link"
-" xref=\"help:gnome-help/nautilus-connect#types\">protokolltól</link> függően."
+"Ha korábban még nem kapcsolódott a távoli fájlrendszerhez, akkor írja be az "
+"URL-t a <gui>Kiszolgáló címének megadása…</gui> mezőbe a <gui>Kapcsolódás "
+"kiszolgálóhoz</gui> alatt. Ez általában egy protokollból, kettőspontból, két "
+"osztásjelből áll. Ez a formátum eltérhet, a használt <link xref=\"help:gnome-"
+"help/nautilus-connect#types\">protokolltól</link> függően."
 
 #. (itstool) path: item/p
 #: C/scan-remote.page:55
@@ -579,7 +569,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/scan-remote.page:62
-#| msgid "Click <gui>Open</gui> to start the scan."
 msgid "Click <gui>Open</gui> to continue."
 msgstr "Kattintson a <gui>Megnyitás</gui> menüpontra a folytatáshoz."
 

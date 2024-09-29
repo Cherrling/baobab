@@ -35,14 +35,11 @@
 namespace Baobab {
 
     public abstract class ChartItem {
-        public string name;
-        public string size;
         public uint depth;
         public double rel_start;
         public double rel_size;
-        public Gtk.TreeIter iter;
+        public Scanner.Results results;
         public bool visible;
-        public bool has_any_child;
         public bool has_visible_children;
         public Gdk.Rectangle rect;
 
@@ -59,7 +56,15 @@ namespace Baobab {
 
         bool model_changed;
 
-        Gtk.Menu context_menu = null;
+        Gtk.PopoverMenu context_menu = null;
+
+        Gtk.EventControllerScroll scroll_controller;
+        Gtk.EventControllerMotion motion_controller;
+        Gtk.GestureClick primary_click_gesture;
+        Gtk.GestureClick secondary_click_gesture;
+        Gtk.GestureClick middle_click_gesture;
+
+        Gdk.RGBA chart_colors[NUM_COLORS];
 
         List<ChartItem> items;
 
@@ -67,8 +72,8 @@ namespace Baobab {
         public Location location {
             set {
                 location_ = value;
-                model = location_.scanner;
-                model.bind_property ("max-depth", this, "max-depth", BindingFlags.SYNC_CREATE);
+                model = location_.scanner.root.create_tree_model ();
+                location_.scanner.bind_property ("max-depth", this, "max-depth", BindingFlags.SYNC_CREATE);
             }
 
             get {
@@ -92,8 +97,8 @@ namespace Baobab {
             }
         }
 
-        Gtk.TreeModel model_;
-        protected Gtk.TreeModel model {
+        Gtk.TreeListModel model_;
+        protected Gtk.TreeListModel model {
             set {
                 if (model_ == value) {
                     return;
@@ -106,7 +111,7 @@ namespace Baobab {
                 model_ = value;
                 model_changed = true;
 
-                root = null;
+                tree_root = null;
 
                 connect_model_signals (model_);
 
@@ -117,22 +122,17 @@ namespace Baobab {
             }
         }
 
-        Gtk.TreeRowReference? root_;
-        public Gtk.TreePath? root {
+        Scanner.Results? root_;
+        public Scanner.Results? tree_root {
             set {
                 if (model == null) {
                     return;
                 }
 
-                if (root_ != null) {
-                    var current_root = root_.get_path ();
-                    if (current_root != null && value != null && current_root.compare (value) == 0) {
-                        return;
-                    }
-                } else if (value == null) {
+                if (root_ == value) {
                     return;
                 }
-                root_ = (value != null) ? new Gtk.TreeRowReference (model, value) : null;
+                root_ = value;
 
                 highlighted_item = null;
 
@@ -140,13 +140,15 @@ namespace Baobab {
             }
             owned get {
                 if (root_ != null) {
-                    var path = root_.get_path ();
-                    if (path != null) {
-                        return path;
-                    }
-                    root_ = null;
+                    return root_;
                 }
-                return new Gtk.TreePath.first ();
+
+                // FIXME This feels dirty, I probably should find a cleaner way to get the model's root
+                if (location != null && location_.scanner != null) {
+                    return location_.scanner.root;
+                }
+
+                return null;
             }
         }
 
@@ -158,10 +160,10 @@ namespace Baobab {
                 }
 
                 if (highlighted_item_ != null) {
-                    get_window ().invalidate_rect (highlighted_item_.rect, true);
+                    queue_draw ();
                 }
                 if (value != null) {
-                    get_window ().invalidate_rect (value.rect, true);
+                    queue_draw ();
                 }
 
                 highlighted_item_ = value;
@@ -171,7 +173,7 @@ namespace Baobab {
             }
         }
 
-        public signal void item_activated (Gtk.TreeIter iter);
+        public signal void item_activated (Scanner.Results item);
 
         protected virtual void post_draw  (Cairo.Context cr) {
         }
@@ -200,17 +202,60 @@ namespace Baobab {
         };
 
         construct {
-            add_events (Gdk.EventMask.EXPOSURE_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.SCROLL_MASK);
+            scroll_controller = new Gtk.EventControllerScroll (Gtk.EventControllerScrollFlags.BOTH_AXES);
+            scroll_controller.scroll.connect (scroll_cb);
+            add_controller (scroll_controller);
+
+            motion_controller = new Gtk.EventControllerMotion ();
+            motion_controller.motion.connect (motion_cb);
+            motion_controller.enter.connect (enter_cb);
+            add_controller (motion_controller);
+
+            primary_click_gesture = new Gtk.GestureClick ();
+            primary_click_gesture.button = Gdk.BUTTON_PRIMARY;
+            primary_click_gesture.pressed.connect ((_, x, y) => {
+                if (highlight_item_at_point (x, y)) {
+                    if (tree_root == highlighted_item.results) {
+                        move_up_root ();
+                    } else {
+                        item_activated (highlighted_item.results);
+                    }
+                }
+            });
+            add_controller (primary_click_gesture);
+
+            secondary_click_gesture = new Gtk.GestureClick ();
+            secondary_click_gesture.button = Gdk.BUTTON_SECONDARY;
+            secondary_click_gesture.pressed.connect ((_, x, y) => {
+                show_popover_at ((int) x, (int) y);
+            });
+            add_controller (secondary_click_gesture);
+
+            middle_click_gesture = new Gtk.GestureClick ();
+            middle_click_gesture.button = Gdk.BUTTON_MIDDLE;
+            middle_click_gesture.pressed.connect ((_, x, y) => {
+                move_up_root ();
+            });
+            add_controller (middle_click_gesture);
 
             action_group = new SimpleActionGroup ();
             action_group.add_action_entries (action_entries, this);
             insert_action_group ("chart", action_group);
 
             build_context_menu ();
+
+            chart_colors[0].parse("#e01b24");
+            chart_colors[1].parse("#ff7800");
+            chart_colors[2].parse("#f6d32d");
+            chart_colors[3].parse("#33d17a");
+            chart_colors[4].parse("#3584e4");
+            chart_colors[5].parse("#9141ac");
+
+            set_draw_func (draw_func);
         }
 
-        public override void size_allocate (Gtk.Allocation allocation) {
-            base.size_allocate (allocation);
+        public override void size_allocate (int width, int height, int baseline) {
+            base.size_allocate (width, height, baseline);
             foreach (ChartItem item in items) {
                 item.has_visible_children = false;
                 item.visible = false;
@@ -231,41 +276,24 @@ namespace Baobab {
             return false;
         }
 
-        public override bool motion_notify_event (Gdk.EventMotion event) {
-            has_tooltip = highlight_item_at_point (event.x, event.y);
-
-            Gdk.Event.request_motions (event);
-
-            return false;
+        void motion_cb (double x, double y) {
+            has_tooltip = highlight_item_at_point (x, y);
         }
 
-        public override bool leave_notify_event (Gdk.EventCrossing event) {
+        void enter_cb (double x, double y) { 
             if (!context_menu.visible) {
-                highlighted_item = null;
+                has_tooltip = highlight_item_at_point (x, y);
             }
-
-            return false;
         }
 
-        unowned List<ChartItem> add_item (uint depth, double rel_start, double rel_size, Gtk.TreeIter iter) {
-            string name;
-            string display_name;
-            uint64 size;
-            model.get (iter,
-                       Scanner.Columns.NAME, out name,
-                       Scanner.Columns.DISPLAY_NAME, out display_name,
-                       Scanner.Columns.SIZE, out size);
-
+        unowned List<ChartItem> add_item (uint depth, double rel_start, double rel_size, Scanner.Results results) {
             var item = create_new_chartitem ();
-            item.name = format_name (display_name, name);
-            item.size = format_size (size);
             item.depth = depth;
             item.rel_start = rel_start;
             item.rel_size = rel_size;
-            item.has_any_child = false;
             item.visible = false;
             item.has_visible_children = false;
-            item.iter = iter;
+            item.results = results;
             item.parent = null;
 
             items.prepend (item);
@@ -274,32 +302,18 @@ namespace Baobab {
             return ret;
         }
 
-        void get_items (Gtk.TreePath root_path) {
-            unowned List<ChartItem> node = null;
-            Gtk.TreeIter initial_iter = {0};
-            double percent;
-            Gtk.TreePath model_root_path;
-            Gtk.TreeIter model_root_iter;
-            Gtk.TreeIter child_iter = {0};
-            unowned List<ChartItem> child_node;
-            double rel_start;
-
+        void get_items (Scanner.Results? root_path) {
             items = null;
 
-            if (!model.get_iter (out initial_iter, root_path)) {
+            if (root_path == null) {
                 model_changed = false;
                 return;
             }
 
-            model_root_path = new Gtk.TreePath.first ();
-            model.get_iter (out model_root_iter, model_root_path);
-            model.get (model_root_iter, Scanner.Columns.PERCENT, out percent);
-
-            node = add_item (0, 0, 100, initial_iter);
+            unowned List<ChartItem> node = add_item (0, 0, 100, root_path);
 
             do {
                 ChartItem item = node.data;
-                item.has_any_child = model.iter_children (out child_iter, item.iter);
 
                 calculate_item_geometry (item);
 
@@ -308,15 +322,22 @@ namespace Baobab {
                     continue;
                 }
 
-                if ((item.has_any_child) && (item.depth < max_depth + 1)) {
-                    rel_start = 0;
-                    do {
-                        model.get (child_iter, Scanner.Columns.PERCENT, out percent);
-                        child_node = add_item (item.depth + 1, rel_start, percent, child_iter);
+                if ((!item.results.is_empty) && (item.depth < max_depth + 1)) {
+                    double rel_start = 0;
+                    CompareDataFunc<Scanner.Results> reverse_size_cmp = (a, b) => {
+                        return a.size < b.size ? 1 :
+                               a.size > b.size ? -1 :
+                               0;
+                    };
+                    var sorter = new Gtk.CustomSorter (reverse_size_cmp);
+                    var sorted = new Gtk.SortListModel (item.results.children_list_store, sorter);
+                    for (var i = 0; i < sorted.n_items; i++) {
+                        var child_iter = sorted.get_object (i) as Scanner.Results;
+                        unowned List<ChartItem> child_node = add_item (item.depth + 1, rel_start, child_iter.percent, child_iter);
                         var child = child_node.data;
                         child.parent = node;
-                        rel_start += percent;
-                    } while (model.iter_next (ref child_iter));
+                        rel_start += child_iter.percent;
+                    }
                 }
 
                 node = node.prev;
@@ -331,11 +352,7 @@ namespace Baobab {
             cr.save ();
 
             foreach (ChartItem item in items) {
-                Gdk.Rectangle clip;
-                if (Gdk.cairo_get_clip_rectangle (cr, out clip) &&
-                    item.visible &&
-                    clip.intersect (item.rect, null) &&
-                    (item.depth <= max_depth)) {
+                if (item.visible && (item.depth <= max_depth)) {
                     bool highlighted = (item == highlighted_item);
                     draw_item (cr, item, highlighted);
                 }
@@ -346,77 +363,38 @@ namespace Baobab {
             post_draw (cr);
         }
 
-        void update_draw (Gtk.TreePath path) {
+        void update_draw () {
             if (!get_realized ()) {
                 return;
             }
 
-            var root_depth = root.get_depth ();
-            var node_depth = path.get_depth ();
-
-            if (((node_depth - root_depth) <= max_depth) &&
-                (root.is_ancestor (path) ||
-                 root.compare (path) == 0)) {
-                queue_draw ();
-            }
+            queue_draw ();
         }
 
-        void row_changed (Gtk.TreeModel model,
-                          Gtk.TreePath path,
-                          Gtk.TreeIter iter) {
+        void items_changed (uint position, uint removed, uint added) {
             model_changed = true;
-            update_draw (path);
+            update_draw ();
         }
 
-        void row_inserted (Gtk.TreeModel model,
-                           Gtk.TreePath path,
-                           Gtk.TreeIter iter) {
-            model_changed = true;
-            update_draw (path);
-        }
-
-        void row_deleted (Gtk.TreeModel model,
-                          Gtk.TreePath path) {
-            model_changed = true;
-            update_draw (path);
-        }
-
-        void row_has_child_toggled (Gtk.TreeModel model,
-                                    Gtk.TreePath path,
-                                    Gtk.TreeIter iter) {
-            model_changed = true;
-            update_draw (path);
-        }
-
-        void rows_reordered (Gtk.TreeModel model,
-                             Gtk.TreePath path,
-                             Gtk.TreeIter? iter,
-                             void *new_order) {
-            model_changed = true;
-            update_draw (path);
-        }
-
-        public override bool draw (Cairo.Context cr) {
+        void draw_func (Gtk.DrawingArea da, Cairo.Context cr, int width, int height) {
             if (model != null) {
                 if (model_changed || items == null) {
-                    get_items (root);
+                    get_items (tree_root);
                 } else {
-                    var current_path = model.get_path (items.data.iter);
-                    if (root.compare (current_path) != 0) {
-                        get_items (root);
+                    var current_path = items.data.results;
+                    if (tree_root != current_path) {
+                        get_items (tree_root);
                     }
                 }
 
                 draw_chart (cr);
             }
-
-            return false;
         }
 
-        Gdk.RGBA interpolate_colors (Gdk.RGBA colora, Gdk.RGBA colorb, double percentage) {
+        Gdk.RGBA interpolate_colors (Gdk.RGBA colora, Gdk.RGBA colorb, float percentage) {
             var color = Gdk.RGBA ();
 
-            double diff;
+            float diff;
 
             diff = colora.red - colorb.red;
             color.red = colora.red - diff * percentage;
@@ -425,30 +403,29 @@ namespace Baobab {
             diff = colora.blue - colorb.blue;
             color.blue = colora.blue - diff * percentage;
 
-            color.alpha = 1.0;
+            color.alpha = (float) 1.0;
 
             return color;
         }
 
         protected Gdk.RGBA get_item_color (double rel_position, uint depth, bool highlighted) {
-            var context = get_style_context ();
-
             var color = Gdk.RGBA ();
 
-            double intensity = 1 - (((depth - 1) * 0.3) / MAX_DEPTH);
+            float intensity = (float) (1 - (((depth - 1) * 0.3) / MAX_DEPTH));
 
             if (depth == 0) {
-                context.lookup_color ("level_color", out color);
+                color.parse("#d3d6d1");
             } else {
-                Gdk.RGBA color_a, color_b;
+                Gdk.RGBA color_a = Gdk.RGBA ();
+                Gdk.RGBA color_b = Gdk.RGBA ();
 
                 int color_number = (int) (rel_position / (100.0/3));
                 int next_color_number = (color_number + 1) % NUM_COLORS;
 
-                context.lookup_color ("color_" + color_number.to_string (), out color_a);
-                context.lookup_color ("color_" + next_color_number.to_string (), out color_b);
+                color_a = chart_colors[color_number];
+                color_b = chart_colors[next_color_number];
 
-                color = interpolate_colors (color_a, color_b, (rel_position - color_number * 100/3) / (100/3));
+                color = interpolate_colors (color_a, color_b, (float) (rel_position - color_number * 100/3) / (100/3));
 
                 color.red *= intensity;
                 color.green *= intensity;
@@ -457,9 +434,9 @@ namespace Baobab {
 
             if (highlighted) {
                 if (depth == 0) {
-                    context.lookup_color ("level_color_hi", out color);
+                    color.parse("#e0e2dd");
                 } else {
-                    double maximum = double.max (color.red, double.max (color.green, color.blue));
+                    float maximum = float.max (color.red, float.max (color.green, color.blue));
                     color.red /= maximum;
                     color.green /= maximum;
                     color.blue /= maximum;
@@ -469,81 +446,40 @@ namespace Baobab {
             return color;
         }
 
-        protected override bool button_press_event (Gdk.EventButton event) {
-            if (event.type == Gdk.EventType.BUTTON_PRESS) {
-                if (event.triggers_context_menu ()) {
-                    show_popup_menu (event);
-                    return true;
-                }
-
-                switch (event.button) {
-                case Gdk.BUTTON_PRIMARY:
-                    if (highlight_item_at_point (event.x, event.y)) {
-                        var path = model.get_path (highlighted_item.iter);
-                        if (root.compare (path) == 0) {
-                            move_up_root ();
-                        } else {
-                            item_activated (highlighted_item.iter);
-                        }
-                    }
-                    break;
-                case Gdk.BUTTON_MIDDLE:
-                    move_up_root ();
-                    break;
-                }
-
+        bool scroll_cb (double dx, double dy) {
+            // Up or to the left
+            if (dx > 0.0 || dy < 0.0) {
+                zoom_out ();
+                return true;
+            // Down or to the right
+            } else if (dx < 0.0 || dy > 0.0) {
+                zoom_in ();
                 return true;
             }
 
             return false;
         }
 
-        protected override bool scroll_event (Gdk.EventScroll event) {
-            Gdk.EventMotion e = (Gdk.EventMotion) event;
-            switch (event.direction) {
-            case Gdk.ScrollDirection.LEFT:
-            case Gdk.ScrollDirection.UP:
-                zoom_out ();
-                motion_notify_event (e);
-                break;
-            case Gdk.ScrollDirection.RIGHT:
-            case Gdk.ScrollDirection.DOWN:
-                zoom_in ();
-                motion_notify_event (e);
-                break;
-            case Gdk.ScrollDirection.SMOOTH:
-                break;
-            }
-
-            return false;
-        }
-
         public void open_file () {
-            ((Window) get_toplevel ()).open_item (highlighted_item.iter);
+            ((Window) get_root ()).open_item (highlighted_item.results);
         }
 
         public void copy_path () {
-            ((Window) get_toplevel ()).copy_path (highlighted_item.iter);
+            ((Window) get_root ()).copy_path (highlighted_item.results);
         }
 
         public void trash_file () {
-            ((Window) get_toplevel ()).trash_file (highlighted_item.iter);
+            ((Window) get_root ()).trash_file (highlighted_item.results);
         }
 
         protected bool can_move_up_root () {
-            Gtk.TreeIter iter, parent_iter;
-
-            model.get_iter (out iter, root);
-            return model.iter_parent (out parent_iter, iter);
+            return tree_root.parent != null;
         }
 
         public void move_up_root () {
-            Gtk.TreeIter iter, parent_iter;
-
-            model.get_iter (out iter, root);
-            if (model.iter_parent (out parent_iter, iter)) {
-                root = model.get_path (parent_iter);
-                item_activated (parent_iter);
+            if (tree_root.parent != null) {
+                tree_root = tree_root.parent;
+                item_activated (tree_root);
             }
         }
 
@@ -561,11 +497,12 @@ namespace Baobab {
 
         void build_context_menu () {
             var menu_model = Application.get_default ().get_menu_by_id ("chartmenu");
-            context_menu = new Gtk.Menu.from_model (menu_model);
-            context_menu.attach_to_widget (this, null);
+            context_menu = new Gtk.PopoverMenu.from_model (menu_model);
+            context_menu.set_parent (this);
+            context_menu.set_position (Gtk.PositionType.BOTTOM);
         }
 
-        void show_popup_menu (Gdk.EventButton? event) {
+        void show_popover_at (int x, int y) {
             var enable = highlighted_item != null;
             var action = action_group.lookup_action ("open-file") as SimpleAction;
             action.set_enabled (enable);
@@ -582,35 +519,28 @@ namespace Baobab {
             action = action_group.lookup_action ("zoom-out") as SimpleAction;
             action.set_enabled (can_zoom_out ());
 
-            context_menu.popup_at_pointer (event);
+            Gdk.Rectangle rect = { x, y, 0, 0 };
+            context_menu.set_pointing_to (rect);
+            context_menu.popup ();
         }
 
-        void connect_model_signals (Gtk.TreeModel m) {
-            m.row_changed.connect (row_changed);
-            m.row_inserted.connect (row_inserted);
-            m.row_has_child_toggled.connect (row_has_child_toggled);
-            m.row_deleted.connect (row_deleted);
-            m.rows_reordered.connect (rows_reordered);
+        void connect_model_signals (Gtk.TreeListModel m) {
+            m.items_changed.connect (items_changed);
         }
 
-        void disconnect_model_signals (Gtk.TreeModel m) {
-            m.row_changed.disconnect (row_changed);
-            m.row_inserted.disconnect (row_inserted);
-            m.row_has_child_toggled.disconnect (row_has_child_toggled);
-            m.row_deleted.disconnect (row_deleted);
-            m.rows_reordered.disconnect (rows_reordered);
+        void disconnect_model_signals (Gtk.TreeListModel m) {
+            m.items_changed.disconnect (items_changed);
         }
 
         protected override bool query_tooltip (int x, int y, bool keyboard_tooltip, Gtk.Tooltip tooltip) {
-            if (highlighted_item == null ||
-                highlighted_item.name == null ||
-                highlighted_item.size == null) {
+            if (highlighted_item == null) {
                 return false;
             }
 
             tooltip.set_tip_area (highlighted_item.rect);
 
-            var markup = highlighted_item.name + "\n" + highlighted_item.size;
+            var size = format_size (highlighted_item.results.size);
+            var markup = highlighted_item.results.display_name + "\n" + size;
             tooltip.set_markup (Markup.escape_text (markup));
 
             return true;

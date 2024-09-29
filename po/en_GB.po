@@ -3,27 +3,28 @@
 # Bastien Nocera <hadess@hadess.net>.
 # Gareth Owen <gowen72@yahoo.com>, David Lodge <dave@cirt.net>, 2004.
 # Philip Withnall <philip@tecnocode.co.uk>, 2009.
-# Bruce Cowan <bruce@bcowan.me.uk>, 2009, 2010, 2011, 2012, 2019.
 # Zander Brown <zbrown@gnome.org>, 2020-2021.
+# Bruce Cowan <bruce@bcowan.me.uk>, 2009-2024.
+# Andi Chandler <andi@gowling.com>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: baobab\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/baobab/issues\n"
-"POT-Creation-Date: 2021-02-21 14:17+0000\n"
-"PO-Revision-Date: 2021-03-22 12:42+0000\n"
-"Last-Translator: Zander Brown <zbrown@gnome.org>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/baobab/issues/\n"
+"POT-Creation-Date: 2024-09-03 20:06+0000\n"
+"PO-Revision-Date: 2024-09-10 11:16+0100\n"
+"Last-Translator: Bruce Cowan <bruce@bcowan.me.uk>\n"
 "Language-Team: English - United Kingdom <en_GB@li.org>\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 3.38.0\n"
+"X-Generator: Poedit 3.4.4\n"
 "X-Project-Style: gnome\n"
 
 #: data/org.gnome.baobab.appdata.xml.in:6 data/org.gnome.baobab.desktop.in:3
-#: data/ui/baobab-main-window.ui:66 src/baobab-window.vala:292
+#: data/ui/baobab-main-window.ui:35 src/baobab-window.vala:260
 msgid "Disk Usage Analyzer"
 msgstr "Disk Usage Analyser"
 
@@ -49,11 +50,16 @@ msgstr ""
 "accounts. It provides both a tree and a graphical representation showing the "
 "size of each folder, making it easy to identify where disk space is wasted."
 
-#: data/org.gnome.baobab.appdata.xml.in:23
-msgid "Devices and Locations"
-msgstr "Devices and Locations"
+#: data/org.gnome.baobab.appdata.xml.in:20
+msgid "Devices and Locations View"
+msgstr "Devices and Locations View"
 
-#: data/org.gnome.baobab.appdata.xml.in:38
+#: data/org.gnome.baobab.appdata.xml.in:24
+msgid "Scan View"
+msgstr "Scan View"
+
+#. developer_name tag deprecated with Appstream 1.0
+#: data/org.gnome.baobab.appdata.xml.in:43 src/baobab-window.vala:262
 msgid "The GNOME Project"
 msgstr "The GNOME Project"
 
@@ -87,114 +93,110 @@ msgid "The initial size of the window"
 msgstr "The initial size of the window"
 
 #: data/org.gnome.baobab.gschema.xml:30
-msgid "Window state"
-msgstr "Window state"
+msgid "Window Maximized"
+msgstr "Window Maximised"
 
 #: data/org.gnome.baobab.gschema.xml:31
-msgid "The GdkWindowState of the window"
-msgstr "The GdkWindowState of the window"
+msgid "Whether or not the window is maximized"
+msgstr "Whether or not the window is maximised"
 
-#: data/gtk/help-overlay.ui:13
+#: data/gtk/help-overlay.ui:11
 msgctxt "shortcut window"
 msgid "General"
 msgstr "General"
 
-#: data/gtk/help-overlay.ui:18
+#: data/gtk/help-overlay.ui:15
 msgctxt "shortcut window"
 msgid "Show help"
 msgstr "Show help"
 
-#: data/gtk/help-overlay.ui:25
+#: data/gtk/help-overlay.ui:21
 msgctxt "shortcut window"
 msgid "Show / Hide primary menu"
 msgstr "Show / Hide primary menu"
 
-#: data/gtk/help-overlay.ui:31
+#: data/gtk/help-overlay.ui:27
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Quit"
 
-#: data/gtk/help-overlay.ui:38
+#: data/gtk/help-overlay.ui:33
 msgctxt "shortcut window"
 msgid "Show Keyboard Shortcuts"
 msgstr "Show Keyboard Shortcuts"
 
-#: data/gtk/help-overlay.ui:46
+#: data/gtk/help-overlay.ui:39
 msgctxt "shortcut window"
-msgid "Go back to location list"
-msgstr "Go back to location list"
+msgid "Show preferences"
+msgstr "Show preferences"
 
-#: data/gtk/help-overlay.ui:54
+#: data/gtk/help-overlay.ui:46
 msgctxt "shortcut window"
 msgid "Scanning"
 msgstr "Scanning"
 
-#: data/gtk/help-overlay.ui:59
+#: data/gtk/help-overlay.ui:50
 msgctxt "shortcut window"
 msgid "Scan folder"
 msgstr "Scan folder"
 
-#: data/gtk/help-overlay.ui:66
+#: data/gtk/help-overlay.ui:56
 msgctxt "shortcut window"
 msgid "Rescan current location"
 msgstr "Rescan current location"
 
-#: data/gtk/menus.ui:7 data/ui/baobab-main-window.ui:42
-msgid "_Open Folder"
-msgstr "_Open Folder"
+#: data/gtk/menus.ui:7 data/ui/baobab-treeview-menu.ui:6
+msgid "_Open Externally"
+msgstr "_Open Externally"
 
-#: data/gtk/menus.ui:11 data/ui/baobab-main-window.ui:51
+#: data/gtk/menus.ui:11 data/ui/baobab-treeview-menu.ui:10
 msgid "_Copy Path to Clipboard"
 msgstr "_Copy Path to Clipboard"
 
-#: data/gtk/menus.ui:15 data/ui/baobab-main-window.ui:60
+#: data/gtk/menus.ui:15 data/ui/baobab-treeview-menu.ui:14
 msgid "Mo_ve to Trash"
 msgstr "Mo_ve to Wastebasket"
 
 #: data/gtk/menus.ui:21
-msgid "Go to _parent folder"
-msgstr "Go to _parent folder"
+msgid "Go to _Parent Folder"
+msgstr "Go to _Parent Folder"
 
 #: data/gtk/menus.ui:27
-msgid "Zoom _in"
-msgstr "Zoom _in"
+msgid "Zoom _In"
+msgstr "Zoom _In"
 
 #: data/gtk/menus.ui:31
-msgid "Zoom _out"
-msgstr "Zoom _out"
+msgid "Zoom _Out"
+msgstr "Zoom _Out"
 
-#: data/ui/baobab-folder-display.ui:16 data/ui/baobab-main-window.ui:267
+#: data/ui/baobab-excluded-row.ui:7
+#| msgid "Scan Remote Folder"
+msgid "Remove Folder"
+msgstr "Remove Folder"
+
+#: data/ui/baobab-folder-display.ui:26 data/ui/baobab-main-window.ui:144
 msgid "Folder"
 msgstr "Folder"
 
-#: data/ui/baobab-folder-display.ui:39 data/ui/baobab-main-window.ui:295
+#: data/ui/baobab-folder-display.ui:56 data/ui/baobab-main-window.ui:158
 msgid "Size"
 msgstr "Size"
 
-#: data/ui/baobab-folder-display.ui:55 data/ui/baobab-main-window.ui:311
+#: data/ui/baobab-folder-display.ui:85 data/ui/baobab-main-window.ui:171
 msgid "Contents"
 msgstr "Contents"
 
-#: data/ui/baobab-folder-display.ui:71 data/ui/baobab-main-window.ui:327
+#: data/ui/baobab-folder-display.ui:114 data/ui/baobab-main-window.ui:184
 msgid "Modified"
 msgstr "Modified"
 
-#: data/ui/baobab-location-list.ui:18
-msgid "This Computer"
-msgstr "This Computer"
+#: data/ui/baobab-location-list.ui:6
+msgid "This Device"
+msgstr "This Device"
 
-#: data/ui/baobab-location-list.ui:45
+#: data/ui/baobab-location-list.ui:19
 msgid "Remote Locations"
 msgstr "Remote Locations"
-
-#: data/ui/baobab-preferences-dialog.ui:8 data/ui/baobab-main-window.ui:17
-msgid "Preferences"
-msgstr "Preferences"
-
-#: data/ui/baobab-preferences-dialog.ui:17
-#| msgid "Locations to ignore"
-msgid "Locations to Ignore"
-msgstr "Locations to Ignore"
 
 #: data/ui/baobab-main-window.ui:7
 msgid "Scan Folder…"
@@ -203,6 +205,10 @@ msgstr "Scan Folder…"
 #: data/ui/baobab-main-window.ui:11
 msgid "Clear Recent List"
 msgstr "Clear Recent List"
+
+#: data/ui/baobab-main-window.ui:17 data/ui/baobab-preferences-dialog.ui:5
+msgid "Preferences"
+msgstr "Preferences"
 
 #: data/ui/baobab-main-window.ui:21
 msgid "Keyboard _Shortcuts"
@@ -216,25 +222,37 @@ msgstr "_Help"
 msgid "_About Disk Usage Analyzer"
 msgstr "_About Disk Usage Analyser"
 
-#: data/ui/baobab-main-window.ui:85
-msgid "Go back to location list"
-msgstr "Go back to location list"
+#: data/ui/baobab-main-window.ui:45 src/baobab-window.vala:571
+msgid "Devices & Locations"
+msgstr "Devices & Locations"
 
-#: data/ui/baobab-main-window.ui:106
-msgid "Rescan current location"
-msgstr "Rescan current location"
+#: data/ui/baobab-main-window.ui:55
+msgid "Main Menu"
+msgstr "Main Menu"
 
-#: data/ui/baobab-main-window.ui:196
-msgid "Close"
-msgstr "Close"
+#: data/ui/baobab-main-window.ui:70
+msgid "Results"
+msgstr "Results"
 
-#: data/ui/baobab-main-window.ui:372
-msgid "Rings Chart"
-msgstr "Rings Chart"
+#: data/ui/baobab-main-window.ui:90
+msgid "Rescan Current Location"
+msgstr "Rescan Current Location"
 
-#: data/ui/baobab-main-window.ui:384
-msgid "Treemap Chart"
-msgstr "Treemap Chart"
+#: data/ui/baobab-main-window.ui:100
+msgid "Files may take more space than shown"
+msgstr "Files may take more space than shown"
+
+#: data/ui/baobab-main-window.ui:259
+msgid "_Rings Chart"
+msgstr "_Rings Chart"
+
+#: data/ui/baobab-main-window.ui:273
+msgid "_Treemap Chart"
+msgstr "_Treemap Chart"
+
+#: data/ui/baobab-preferences-dialog.ui:11
+msgid "Locations to Ignore"
+msgstr "Locations to Ignore"
 
 #: src/baobab-application.vala:33
 msgid ""
@@ -248,7 +266,7 @@ msgstr ""
 msgid "Print version information and exit"
 msgstr "Print version information and exit"
 
-#: src/baobab-cellrenderers.vala:34
+#: src/baobab-cellrenderers.vala:24
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -256,17 +274,17 @@ msgstr[0] "%d item"
 msgstr[1] "%d items"
 
 #. Translators: when the last modified time is unknown
-#: src/baobab-cellrenderers.vala:40 src/baobab-location-list.vala:80
+#: src/baobab-cellrenderers.vala:30 src/baobab-location-list.vala:81
 msgid "Unknown"
 msgstr "Unknown"
 
 #. Translators: when the last modified time is today
-#: src/baobab-cellrenderers.vala:48
+#: src/baobab-cellrenderers.vala:38
 msgid "Today"
 msgstr "Today"
 
 #. Translators: when the last modified time is "days" days ago
-#: src/baobab-cellrenderers.vala:53
+#: src/baobab-cellrenderers.vala:43
 #, c-format
 msgid "%lu day"
 msgid_plural "%lu days"
@@ -274,7 +292,7 @@ msgstr[0] "%lu day"
 msgstr[1] "%lu days"
 
 #. Translators: when the last modified time is "months" months ago
-#: src/baobab-cellrenderers.vala:58
+#: src/baobab-cellrenderers.vala:48
 #, c-format
 msgid "%lu month"
 msgid_plural "%lu months"
@@ -282,7 +300,7 @@ msgstr[0] "%lu month"
 msgstr[1] "%lu months"
 
 #. Translators: when the last modified time is "years" years ago
-#: src/baobab-cellrenderers.vala:62
+#: src/baobab-cellrenderers.vala:52
 #, c-format
 msgid "%lu year"
 msgid_plural "%lu years"
@@ -294,70 +312,52 @@ msgstr[1] "%lu years"
 msgid "%s Total"
 msgstr "%s Total"
 
-#: src/baobab-location-list.vala:71
+#: src/baobab-location-list.vala:72
 #, c-format
 msgid "%s Available"
 msgstr "%s Available"
 
 #. useful for some remote mounts where we don't know the
 #. size but do have a usage figure
-#: src/baobab-location-list.vala:85
+#: src/baobab-location-list.vala:86
 #, c-format
 msgid "%s Used"
 msgstr "%s Used"
 
-#: src/baobab-location-list.vala:87
+#: src/baobab-location-list.vala:88
 msgid "Unmounted"
 msgstr "Unmounted"
 
-#: src/baobab-location.vala:72
-#| msgid "Home folder"
+#: src/baobab-location.vala:73
 msgid "Home Folder"
 msgstr "Home Folder"
 
-#: src/baobab-location.vala:107
+#: src/baobab-location.vala:108
 msgid "Computer"
 msgstr "Computer"
 
 #. The only activatable row is "Add location"
-#: src/baobab-preferences-dialog.vala:53
+#: src/baobab-preferences-dialog.vala:51
 msgid "Select Location to Ignore"
 msgstr "Select Location to Ignore"
 
-#: src/baobab-preferences-dialog.vala:55 src/baobab-window.vala:207
-msgid "_Cancel"
-msgstr "_Cancel"
-
-#: src/baobab-preferences-dialog.vala:56 src/baobab-window.vala:208
-msgid "_Open"
-msgstr "_Open"
-
 #: src/baobab-preferences-dialog.vala:91
-#| msgid "Add location…"
-msgid "Add Location…"
-msgstr "Add Location…"
+msgid "_Add Location"
+msgstr "_Add Location"
 
-#: src/baobab-window.vala:205
+#: src/baobab-window.vala:179
 msgid "Select Folder"
 msgstr "Select Folder"
 
-#: src/baobab-window.vala:214
+#: src/baobab-window.vala:186
 msgid "Recursively analyze mount points"
 msgstr "Recursively analyse mount points"
 
-#: src/baobab-window.vala:236
-msgid "Could not analyze volume."
-msgstr "Could not analyse volume."
+#: src/baobab-window.vala:210
+msgid "Could not analyze volume"
+msgstr "Could not analyse volume"
 
-#: src/baobab-window.vala:273
-msgid "Failed to show help"
-msgstr "Failed to show help"
-
-#: src/baobab-window.vala:295
-msgid "A graphical tool to analyze disk usage."
-msgstr "A graphical tool to analyse disk usage."
-
-#: src/baobab-window.vala:301
+#: src/baobab-window.vala:269
 msgid "translator-credits"
 msgstr ""
 "Bastien Nocera <hadess@hadess.net>\n"
@@ -366,50 +366,83 @@ msgstr ""
 "James Ogley <james@usr-local-bin.org>\n"
 "Philip Withnall <philip@tecnocode.co.uk>\n"
 "Bruce Cowan <bruce@bcowan.me.uk>\n"
-"Zander Brown <zbrown@gnome.org>"
+"Zander Brown <zbrown@gnome.org>\n"
+"Andi Chandler <andi@gowling.com>"
 
-#: src/baobab-window.vala:375
+#: src/baobab-window.vala:329
 msgid "Failed to open file"
 msgstr "Failed to open file"
 
-#: src/baobab-window.vala:392
-msgid "Failed to move file to the trash"
-msgstr "Failed to move file to the trash"
+#: src/baobab-window.vala:346
+msgid "Failed to trash file"
+msgstr "Failed to delete file"
 
-#: src/baobab-window.vala:603
-msgid "Devices & Locations"
-msgstr "Devices & Locations"
+#: src/baobab-window.vala:623
+msgid "Could not scan folder"
+msgstr "Could not scan folder"
 
-#: src/baobab-window.vala:655
-#, c-format
-msgid "Could not scan folder “%s”"
-msgstr "Could not scan folder “%s”"
-
-#: src/baobab-window.vala:670
-msgid "Could not always detect occupied disk sizes."
-msgstr "Could not always detect occupied disk sizes."
-
-#: src/baobab-window.vala:670
-msgid "Apparent sizes may be shown instead."
-msgstr "Apparent sizes may be shown instead."
-
-#: src/baobab-window.vala:674
+#: src/baobab-window.vala:638
 msgid "Scan completed"
 msgstr "Scan completed"
 
-#: src/baobab-window.vala:675
+#: src/baobab-window.vala:639
 #, c-format
 msgid "Completed scan of “%s”"
 msgstr "Completed scan of “%s”"
 
-#: src/baobab-window.vala:715
+#: src/baobab-window.vala:679
 #, c-format
 msgid "“%s” is not a valid folder"
 msgstr "“%s” is not a valid folder"
 
-#: src/baobab-window.vala:716
-msgid "Could not analyze disk usage."
-msgstr "Could not analyse disk usage."
+#~ msgctxt "shortcut window"
+#~ msgid "Go back to location list"
+#~ msgstr "Go back to location list"
+
+#~ msgid "Back"
+#~ msgstr "Back"
+
+#~ msgid "Close"
+#~ msgstr "Close"
+
+#~ msgid "Failed to move file to the trash"
+#~ msgstr "Failed to move file to the trash"
+
+#~ msgid "Could not always detect occupied disk sizes."
+#~ msgstr "Could not always detect occupied disk sizes."
+
+#~ msgid "Apparent sizes may be shown instead."
+#~ msgstr "Apparent sizes may be shown instead."
+
+#~ msgid "Could not analyze disk usage."
+#~ msgstr "Could not analyse disk usage."
+
+#~ msgid "Window state"
+#~ msgstr "Window state"
+
+#~ msgid "The GdkWindowState of the window"
+#~ msgstr "The GdkWindowState of the window"
+
+#~ msgid "_Open Folder"
+#~ msgstr "_Open Folder"
+
+#~ msgid "This Computer"
+#~ msgstr "This Computer"
+
+#~ msgid "Go back to location list"
+#~ msgstr "Go back to location list"
+
+#~ msgid "_Cancel"
+#~ msgstr "_Cancel"
+
+#~ msgid "_Open"
+#~ msgstr "_Open"
+
+#~ msgid "Failed to show help"
+#~ msgstr "Failed to show help"
+
+#~ msgid "A graphical tool to analyze disk usage."
+#~ msgstr "A graphical tool to analyse disk usage."
 
 #~ msgid "org.gnome.baobab"
 #~ msgstr "org.gnome.baobab"
@@ -445,17 +478,11 @@ msgstr "Could not analyse disk usage."
 #~ msgid "Set the root node from the model"
 #~ msgstr "Set the root node from the model"
 
-#~ msgid "Main volume"
-#~ msgstr "Main volume"
-
 #~ msgid "Scan Folder"
 #~ msgstr "Scan Folder"
 
 #~ msgid "Scan a remote folder"
 #~ msgstr "Scan a remote folder"
-
-#~ msgid "Scan Remote Folder"
-#~ msgstr "Scan Remote Folder"
 
 #~ msgid "Reload"
 #~ msgstr "Reload"
@@ -608,12 +635,6 @@ msgstr "Could not analyse disk usage."
 
 #~ msgid "_Image type:"
 #~ msgstr "_Image type:"
-
-#~ msgid "Scan"
-#~ msgstr "Scan"
-
-#~ msgid "Device"
-#~ msgstr "Device"
 
 #~ msgid "Mount Point"
 #~ msgstr "Mount Point"

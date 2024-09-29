@@ -20,9 +20,7 @@
 namespace Baobab {
 
     [GtkTemplate (ui = "/org/gnome/baobab/ui/baobab-excluded-row.ui")]
-    class ExcludedRow : Gtk.ListBoxRow {
-        [GtkChild]
-        private unowned Gtk.Label name_label;
+    class ExcludedRow : Adw.ActionRow {
         [GtkChild]
         private unowned Gtk.Button remove_button;
 
@@ -30,16 +28,16 @@ namespace Baobab {
 
         public ExcludedRow (File file) {
             if (file.has_uri_scheme ("file")) {
-                name_label.label = file.get_path ();
+                title = file.get_path ();
             } else {
-                name_label.label = file.get_uri ();
+                title = file.get_uri ();
             }
             remove_button.clicked.connect (() => { removed (); });
         }
     }
 
     [GtkTemplate (ui = "/org/gnome/baobab/ui/baobab-preferences-dialog.ui")]
-    public class PreferencesDialog : Hdy.PreferencesWindow {
+    public class PreferencesDialog : Adw.PreferencesDialog {
         [GtkChild]
         private unowned Gtk.ListBox excluded_list_box;
 
@@ -50,17 +48,15 @@ namespace Baobab {
 
             excluded_list_box.row_activated.connect (() => {
                 // The only activatable row is "Add location"
-                var file_chooser = new Gtk.FileChooserDialog (_("Select Location to Ignore"), this,
-                                                             Gtk.FileChooserAction.SELECT_FOLDER,
-                                                              _("_Cancel"), Gtk.ResponseType.CANCEL,
-                                                              _("_Open"), Gtk.ResponseType.OK);
+                var file_chooser = new Gtk.FileChooserNative (_("Select Location to Ignore"),
+                                                              (Gtk.Window) this.get_root (),
+                                                               Gtk.FileChooserAction.SELECT_FOLDER,
+                                                               null, null);
 
-                file_chooser.local_only = false;
                 file_chooser.modal = true;
-                file_chooser.set_default_response (Gtk.ResponseType.OK);
 
                 file_chooser.response.connect ((response) => {
-                    if (response == Gtk.ResponseType.OK) {
+                    if (response == Gtk.ResponseType.ACCEPT) {
                         var uri = file_chooser.get_file ().get_uri ();
                         add_uri (uri);
                         populate ();
@@ -75,12 +71,14 @@ namespace Baobab {
         }
 
         void populate () {
-            excluded_list_box.foreach ((widget) => { widget.destroy (); });
+            for (Gtk.Widget? child = excluded_list_box.get_first_child (); child != null; child = excluded_list_box.get_first_child ()) {
+                excluded_list_box.remove (child);
+            }
 
             foreach (var uri in prefs_settings.get_strv ("excluded-uris")) {
                 var file = File.new_for_uri (uri);
                 var row = new ExcludedRow (file);
-                excluded_list_box.insert (row, -1);
+                excluded_list_box.append (row);
 
                 row.removed.connect (() => {
                     remove_uri (uri);
@@ -88,10 +86,13 @@ namespace Baobab {
                 });
             }
 
-            var label = new Gtk.Label (_("Add Location…"));
-            label.margin = 12;
-            label.show ();
-            excluded_list_box.insert (label, -1);
+            var button_row = new Adw.ButtonRow ();
+
+            button_row.title = (_("_Add Location"));
+            button_row.start_icon_name = ("list-add-symbolic");
+            button_row.use_underline = true;
+
+            excluded_list_box.append (button_row);
         }
 
         void add_uri (string uri) {

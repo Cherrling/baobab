@@ -23,67 +23,50 @@
 namespace Baobab {
 
     [GtkTemplate (ui = "/org/gnome/baobab/ui/baobab-main-window.ui")]
-    public class Window : Hdy.ApplicationWindow {
+    public class Window : Adw.ApplicationWindow {
         [GtkChild]
-        private unowned Gtk.Box vbox;
+        private unowned Gtk.EventControllerFocus focus_controller;
         [GtkChild]
-        private unowned Hdy.HeaderBar header_bar;
+        private unowned Gtk.DropTarget drop_target;
         [GtkChild]
         private unowned Pathbar pathbar;
         [GtkChild]
-        private unowned Gtk.Button back_button;
-        [GtkChild]
-        private unowned Gtk.Button reload_button;
-        [GtkChild]
-        private unowned Gtk.MenuButton menu_button;
-        [GtkChild]
-        private unowned Gtk.Stack main_stack;
+        private unowned Adw.NavigationView nav_view;
         [GtkChild]
         private unowned Gtk.Widget home_page;
         [GtkChild]
         private unowned Gtk.Widget result_page;
         [GtkChild]
-        private unowned Gtk.InfoBar infobar;
+        private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild]
-        private unowned Gtk.Label infobar_primary_label;
-        [GtkChild]
-        private unowned Gtk.Label infobar_secondary_label;
-        [GtkChild]
-        private unowned Gtk.Button infobar_close_button;
+        private unowned Adw.Banner banner;
         [GtkChild]
         private unowned LocationList location_list;
         [GtkChild]
         private unowned FolderDisplay folder_display;
         [GtkChild]
-        private unowned Gtk.TreeView treeview;
+        private unowned Gtk.ColumnView columnview;
         [GtkChild]
-        private unowned Gtk.Menu treeview_popup_menu;
+        private unowned Gtk.SingleSelection columnview_selection;
         [GtkChild]
-        private unowned Gtk.MenuItem treeview_popup_open;
+        private unowned Gtk.SortListModel columnview_sort_model;
         [GtkChild]
-        private unowned Gtk.MenuItem treeview_popup_copy;
+        private unowned Gtk.PopoverMenu treeview_popover_menu;
         [GtkChild]
-        private unowned Gtk.MenuItem treeview_popup_trash;
-        [GtkChild]
-        private unowned Gtk.TreeViewColumn size_column;
-        [GtkChild]
-        private unowned Gtk.TreeViewColumn contents_column;
-        [GtkChild]
-        private unowned Gtk.TreeViewColumn time_modified_column;
-        [GtkChild]
-        private unowned Gtk.Stack chart_stack;
+        private unowned Adw.ViewStack chart_stack;
         [GtkChild]
         private unowned Gtk.Stack spinner_stack;
         [GtkChild]
-        private unowned Gtk.StackSwitcher chart_stack_switcher;
+        private unowned Adw.ViewSwitcher chart_stack_switcher;
         [GtkChild]
         private unowned Chart rings_chart;
         [GtkChild]
         private unowned Chart treemap_chart;
         [GtkChild]
-        private unowned Gtk.Spinner spinner;
+        private unowned Adw.Spinner spinner;
 
         private Location? active_location = null;
+        private bool is_busy = false;
         private ulong scan_completed_handler = 0;
         private uint scanning_progress_id = 0;
 
@@ -91,13 +74,19 @@ namespace Baobab {
 
         private const GLib.ActionEntry[] action_entries = {
             { "show-primary-menu", on_show_primary_menu_activate, null, "false", null },
-            { "show-home-page", on_show_home_page_activate },
             { "scan-folder", on_scan_folder_activate },
             { "reload", on_reload_activate },
             { "clear-recent", on_clear_recent },
             { "show-preferences", on_show_preferences },
             { "help", on_help_activate },
-            { "about", on_about_activate }
+            { "about", on_about_activate },
+            { "show-treeview-popover", on_show_treeview_popover },
+            { "treeview-expand-row", on_treeview_expand_row },
+            { "treeview-collapse-row", on_treeview_collapse_row },
+            { "treeview-go-up", go_up_treeview },
+            { "treeview-open-folder", on_treeview_open_folder },
+            { "treeview-copy", on_treeview_copy },
+            { "treeview-trash", on_treeview_trash }
         };
 
         protected struct ActionState {
@@ -109,19 +98,11 @@ namespace Baobab {
             { "scan-folder", false },
         };
 
-        private enum DndTargets {
-            URI_LIST
-        }
-
-        private const Gtk.TargetEntry dnd_target_list[1] = {
-            {"text/uri-list", 0, DndTargets.URI_LIST}
-        };
-
         public Window (Application app) {
             Object (application: app);
 
             if (busy_cursor == null) {
-                busy_cursor = new Gdk.Cursor.from_name (get_display(), "wait");
+                busy_cursor = new Gdk.Cursor.from_name ("wait", null);
             }
 
             var ui_settings = new Settings ("org.gnome.baobab.ui");
@@ -133,9 +114,11 @@ namespace Baobab {
 
             location_list.location_activated.connect (location_activated);
 
-            setup_treeview ();
+            var builder = new Gtk.Builder.from_resource("/org/gnome/baobab/ui/baobab-treeview-menu.ui");
+            GLib.MenuModel treeview_menu = (GLib.MenuModel) builder.get_object ("treeview_menu");
 
-            infobar_close_button.clicked.connect (() => { clear_message (); });
+            hide_columnview_header ();
+            treeview_popover_menu.set_menu_model (treeview_menu);
 
             ui_settings.bind ("active-chart", chart_stack, "visible-child-name", SettingsBindFlags.DEFAULT);
             chart_stack.destroy.connect (() => { Settings.unbind (chart_stack, "visible-child-name"); });
@@ -146,48 +129,38 @@ namespace Baobab {
             folder_display.activated.connect (on_folder_display_activated);
 
             // Setup drag-n-drop
-            drag_data_received.connect (on_drag_data_received);
-            enable_drop ();
+            drop_target.set_gtypes ({typeof (Gdk.FileList)});
+            drop_target.on_drop.connect (on_drop);
+            drop_target.accept.connect (on_drop_target_accept);
 
             // Setup window geometry saving
-            Gdk.WindowState window_state = (Gdk.WindowState) ui_settings.get_int ("window-state");
-            if (Gdk.WindowState.MAXIMIZED in window_state) {
+            if (ui_settings.get_boolean ("is-maximized")) {
                 maximize ();
             }
 
             int width, height;
             ui_settings.get ("window-size", "(ii)", out width, out height);
-            resize (width, height);
+            set_default_size (width, height);
 
-            window_state_event.connect ((event) => {
-                ui_settings.set_int ("window-state", event.new_window_state);
-                return false;
-            });
+            ui_settings.bind ("is-maximized", this, "maximized", GLib.SettingsBindFlags.SET);
 
-            configure_event.connect ((event) => {
-                if (!(Gdk.WindowState.MAXIMIZED in get_window ().get_state ())) {
-                    get_size (out width, out height);
-                    ui_settings.set ("window-size", "(ii)", width, height);
+            close_request.connect (() => {
+                if (!maximized) {
+                    int win_width, win_height;
+                    get_default_size (out win_width, out win_height);
+                    ui_settings.set ("window-size", "(ii)", win_width, win_height);
                 }
-                return false;
-            });
-
-            destroy.connect (() => {
                 ui_settings.apply ();
+                return false;
             });
 
             set_ui_state (home_page, false);
 
-            button_press_event.connect ((event) => {
-                // mouse back button
-                if (event.button == 8) {
-                    lookup_action ("show-home-page").activate (null);
-                    return Gdk.EVENT_STOP;
-                }
-                return Gdk.EVENT_PROPAGATE;
+            focus_controller.enter.connect (() => {
+                application.withdraw_notification ("scan-completed");
             });
 
-            show ();
+            present ();
         }
 
         void on_show_primary_menu_activate (SimpleAction action) {
@@ -195,28 +168,28 @@ namespace Baobab {
             action.set_state (new Variant.boolean (!state));
         }
 
-        void on_show_home_page_activate () {
+        [GtkCallback]
+        void results_hidden () {
             cancel_scan ();
-            clear_message ();
+            banner.revealed = false;
             set_ui_state (home_page, false);
         }
 
         void on_scan_folder_activate () {
-            var file_chooser = new Gtk.FileChooserDialog (_("Select Folder"), this,
+            var file_chooser = new Gtk.FileChooserNative (_("Select Folder"), this,
                                                           Gtk.FileChooserAction.SELECT_FOLDER,
-                                                          _("_Cancel"), Gtk.ResponseType.CANCEL,
-                                                          _("_Open"), Gtk.ResponseType.OK);
+                                                          null, null);
 
-            file_chooser.local_only = false;
             file_chooser.modal = true;
-            file_chooser.set_default_response (Gtk.ResponseType.OK);
 
-            var check_button = new Gtk.CheckButton.with_label (_("Recursively analyze mount points"));
-            file_chooser.extra_widget = check_button;
+            file_chooser.add_choice ("recurse",
+                                    _("Recursively analyze mount points"),
+                                    null, null);
 
             file_chooser.response.connect ((response) => {
-                if (response == Gtk.ResponseType.OK) {
-                    var flags = check_button.active ? ScanFlags.NONE : ScanFlags.EXCLUDE_MOUNTS;
+                if (response == Gtk.ResponseType.ACCEPT) {
+                    bool recurse = bool.parse (file_chooser.get_choice ("recurse"));
+                    var flags = recurse ? ScanFlags.NONE : ScanFlags.EXCLUDE_MOUNTS;
                     scan_directory (file_chooser.get_file (), flags);
                 }
                 file_chooser.destroy ();
@@ -233,7 +206,8 @@ namespace Baobab {
                     scan_location (location);
                 } catch (Error e) {
                     set_busy (false);
-                    message (_("Could not analyze volume."), e.message, Gtk.MessageType.ERROR);
+                    warning ("Could not analyze volume: %s\n", e.message);
+                    toast (_("Could not analyze volume"));
                 }
             });
         }
@@ -261,21 +235,15 @@ namespace Baobab {
 
         void on_show_preferences () {
             var dialog = new PreferencesDialog ();
-            dialog.modal = true;
-            dialog.set_transient_for (this);
-            dialog.show ();
+            dialog.present (this);
         }
 
         void on_help_activate () {
-            try {
-                Gtk.show_uri (get_screen (), "help:baobab", Gtk.get_current_event_time ());
-            } catch (Error e) {
-                message (_("Failed to show help"), e.message, Gtk.MessageType.WARNING);
-            }
+            Gtk.show_uri (this, "help:baobab", Gdk.CURRENT_TIME);
         }
 
         void on_about_activate () {
-            const string authors[] = {
+            const string developers[] = {
                 "Ryan Lortie <desrt@desrt.ca>",
                 "Fabio Marzocca <thesaltydog@gmail.com>",
                 "Paolo Borelli <pborelli@gnome.com>",
@@ -288,26 +256,27 @@ namespace Baobab {
             const string copyright = "Copyright \xc2\xa9 2005-2011 Fabio Marzocca, Paolo Borelli, Benoît Dejean, Igalia\n" +
                                      "Copyright \xc2\xa9 2011-2012 Ryan Lortie, Paolo Borelli, Stefano Facchini\n";
 
-            Gtk.show_about_dialog (this,
-                                   "program-name", _("Disk Usage Analyzer"),
-                                   "logo-icon-name", "org.gnome.baobab",
-                                   "version", Config.VERSION,
-                                   "comments", _("A graphical tool to analyze disk usage."),
-                                   "website", "https://wiki.gnome.org/action/show/Apps/DiskUsageAnalyzer",
-                                   "copyright", copyright,
-                                   "license-type", Gtk.License.GPL_2_0,
-                                   "wrap-license", false,
-                                   "authors", authors,
-                                   "translator-credits", _("translator-credits"),
-                                   null);
+            var about = new Adw.AboutDialog() {
+                application_name = _("Disk Usage Analyzer"),
+                application_icon = "org.gnome.baobab",
+                developer_name = _("The GNOME Project"),
+                version = Config.VERSION,
+                website = "https://apps.gnome.org/Baobab/",
+                issue_url = "https://gitlab.gnome.org/GNOME/baobab/-/issues/new",
+                copyright = copyright,
+                license_type = Gtk.License.GPL_2_0,
+                developers = developers,
+                translator_credits = _("translator-credits"),
+            };
+
+            about.present(this);
         }
 
-        void on_chart_item_activated (Chart chart, Gtk.TreeIter iter) {
-            var path = active_location.scanner.get_path (iter);
-            reroot_treeview (path);
+        void on_chart_item_activated (Chart chart, Scanner.Results item) {
+            reroot_treeview (item);
         }
 
-        void on_pathbar_item_activated (Pathbar pathbar, Gtk.TreePath path) {
+        void on_pathbar_item_activated (Pathbar pathbar, Scanner.Results path) {
             reroot_treeview (path);
         }
 
@@ -318,270 +287,274 @@ namespace Baobab {
         void go_up_treeview () {
             var path = folder_display.path;
             if (path != null && path.get_depth () > 1) {
-                var cursor_path = path.copy ();
-                path.up ();
-                reroot_treeview (path);
-                cursor_path = convert_child_path_to_path (cursor_path);
-                treeview.set_cursor (cursor_path, null, false);
+                reroot_treeview (path.parent);
             }
         }
 
-        void on_drag_data_received (Gtk.Widget widget, Gdk.DragContext context, int x, int y,
-                                    Gtk.SelectionData selection_data, uint target_type, uint time) {
-            File dir = null;
+        bool on_drop_target_accept (Gtk.DropTarget target, Gdk.Drop drop) {
+            return !is_busy;
+        }
 
-            if ((selection_data != null) && (selection_data.get_length () >= 0) && (target_type == DndTargets.URI_LIST)) {
-                var uris = GLib.Uri.list_extract_uris ((string) selection_data.get_data ());
-                if (uris != null && uris.length == 1) {
-                    dir = File.new_for_uri (uris[0]);
+        bool on_drop (Gtk.DropTarget target, Value value, double x, double y) {
+            if (value.type () == typeof (Gdk.FileList)) {
+                unowned var files = (SList<File>) value.get_boxed ();
+                File dir = null;
+                if (files != null && files.length () == 1) {
+                    dir = files.nth (0).data;
                 }
+
+                if (dir != null) {
+                    scan_directory (dir);
+                }
+
+                return true;
             }
 
-            if (dir != null) {
-                // finish drop before scanning, since the it can time out
-                Gtk.drag_finish (context, true, false, time);
-                scan_directory (dir);
-            } else {
-                Gtk.drag_finish (context, false, false, time);
-            }
+            return false;
         }
 
-        void enable_drop () {
-            Gtk.drag_dest_set (this,
-                               Gtk.DestDefaults.DROP | Gtk.DestDefaults.MOTION | Gtk.DestDefaults.HIGHLIGHT,
-                               dnd_target_list,
-                               Gdk.DragAction.COPY);
-        }
-
-        void disable_drop () {
-            Gtk.drag_dest_unset (this);
-        }
-
-        bool show_treeview_popup (Gtk.Menu popup, Gdk.EventButton? event) {
-            if (event != null) {
-                popup.popup_at_pointer (event);
-            } else {
-                popup.popup_at_widget (treeview, Gdk.Gravity.CENTER, Gdk.Gravity.CENTER);
-                popup.select_first (false);
-            }
+        bool show_treeview_popover (Gtk.PopoverMenu popover, int x, int y) {
+            Gdk.Rectangle  rect = { x, y, 0, 0, };
+            popover.set_pointing_to (rect);
+            popover.popup ();
             return Gdk.EVENT_STOP;
         }
 
-        public void open_item (Gtk.TreeIter iter) {
-            var file = active_location.scanner.get_file (iter);
+        public void open_item (Scanner.Results results) {
+            var file = active_location.scanner.get_file (results);
             try {
                 AppInfo.launch_default_for_uri (file.get_uri (), null);
             } catch (Error e) {
-                message (_("Failed to open file"), e.message, Gtk.MessageType.ERROR);
+                warning ("Failed to open file: %s\n", e.message);
+                toast (_("Failed to open file"));
             }
         }
 
-        public void copy_path (Gtk.TreeIter iter) {
-            var parse_name = active_location.scanner.get_file (iter).get_parse_name ();
-            var clipboard = Gtk.Clipboard.get (Gdk.SELECTION_CLIPBOARD);
-            clipboard.set_text (parse_name, -1);
-            clipboard.store ();
+        public void copy_path (Scanner.Results results) {
+            var parse_name = active_location.scanner.get_file (results).get_parse_name ();
+            var clipboard = get_clipboard ();
+            clipboard.set_text (parse_name);
         }
 
-        public void trash_file (Gtk.TreeIter iter) {
-            var file = active_location.scanner.get_file (iter);
+        public void trash_file (Scanner.Results results) {
+            var file = active_location.scanner.get_file (results);
             try {
                 file.trash ();
-                active_location.scanner.remove (ref iter);
             } catch (Error e) {
-                message (_("Failed to move file to the trash"), e.message, Gtk.MessageType.ERROR);
+                if (!e.matches (GLib.IOError.quark (), GLib.IOError.NOT_FOUND)) {
+                    warning ("Failed to move to file to the trash: %s", e.message);
+                    toast (_("Failed to trash file"));
+                    return;
+                }
+            }
+
+            var parent = results.parent;
+            uint position = 0;
+            if (results.parent.children_list_store.find (results, out position)) {
+                results.parent.children_list_store.remove (position);
             }
         }
 
-        bool get_selected_iter (out Gtk.TreeIter iter) {
-            Gtk.TreeIter wrapper_iter;
+        bool columnview_selection_find (Object? item, bool passthrough, out uint position) {
+            // Naive search, there likely are ways to improve this,
+            // e.g. using the columnview's sort to do a sort-based
+            // search, or having a way to map an object to its
+            // position directly into the model.
 
-            var selection = treeview.get_selection ();
-            var result = selection.get_selected (null, out wrapper_iter);
+            // We want to scroll to a row, select it and focus it, sadly
+            // Gtk.ColumnView.scroll_to() only lets us scroll to a row's
+            // position, so we need to get it. Gtk.TreeListRow.get_position()
+            // gives us the position of the row in the original unsorted model,
+            // and our Gtk.ColumnView gets a sorted version of it, so in order
+            // to scroll to the row, we have to find its position in the sorted
+            // model. This is a naive way of finding that position, we could
+            // rely on the fact the rows are sorted to find its position in a
+            // more efficient way, and GTK may offer a way to scroll to items
+            // (rows) directly in the future, see:
+            // https://gitlab.gnome.org/GNOME/gtk/-/issues/6747#note_2126025
 
-            convert_iter_to_child_iter (out iter, wrapper_iter);
-
-            return result;
-        }
-
-        void convert_iter_to_child_iter (out Gtk.TreeIter child_iter, Gtk.TreeIter iter) {
-            Gtk.TreeIter filter_iter;
-
-            var sort = (Gtk.TreeModelSort) treeview.model;
-            sort.convert_iter_to_child_iter (out filter_iter, iter);
-
-            var filter = (Gtk.TreeModelFilter) sort.model;
-            filter.convert_iter_to_child_iter (out child_iter, filter_iter);
-        }
-
-        Gtk.TreePath convert_path_to_child_path (Gtk.TreePath path) {
-            var sort = (Gtk.TreeModelSort) treeview.model;
-            var filter_path = sort.convert_path_to_child_path (path);
-
-            var filter = (Gtk.TreeModelFilter) sort.model;
-            return filter.convert_path_to_child_path (filter_path);
-        }
-
-        Gtk.TreePath convert_child_path_to_path (Gtk.TreePath path) {
-            var sort = (Gtk.TreeModelSort) treeview.model;
-            var filter = (Gtk.TreeModelFilter) sort.model;
-            var filter_path = filter.convert_child_path_to_path (path);
-            return sort.convert_child_path_to_path (filter_path);
-        }
-
-        void setup_treeview () {
-            treeview.button_press_event.connect ((event) => {
-                if (event.triggers_context_menu ()) {
-                    Gtk.TreePath path;
-                    if (treeview.get_path_at_pos ((int)event.x, (int)event.y, out path, null, null, null)) {
-                        treeview.get_selection ().select_path (path);
-                        return show_treeview_popup (treeview_popup_menu, event);
-                    }
-                }
-
+            if (item == null) {
                 return false;
-            });
+            }
 
-            treeview.key_press_event.connect ((event) => {
-                Gtk.TreeIter iter;
-                if (treeview.get_selection ().get_selected (null, out iter)) {
-                    Gtk.TreePath path = treeview.model.get_path (iter);
-                    if (event.keyval == Gdk.Key.Right) {
-                        if (treeview.expand_row (path, false)) {
-                            return true;
-                        }
-                    } else if (event.keyval == Gdk.Key.Left) {
-                        if (treeview.collapse_row (path)) {
-                            return true;
-                        } else if (path.up ()) {
-                            treeview.set_cursor(path, null, false);
-                            return true;
-                        }
-                    } else if (event.keyval == Gdk.Key.space) {
-                        if (treeview.expand_row (path, false)) {
-                            return true;
-                        } else if (treeview.collapse_row (path)) {
-                            return true;
-                        }
-                    } else if (event.keyval == Gdk.Key.Up && event.state == Gdk.ModifierType.MOD1_MASK) {
-                        go_up_treeview ();
+            for (uint i = 0; i < columnview_selection.n_items && i < uint.MAX; i++) {
+                if (passthrough) {
+                    // The item is a Scanner.Results contained by a Gtk.TreeListRow
+                    var row = columnview_selection.get_item (i) as Gtk.TreeListRow;
+                    if (row.item == item) {
+                        position = i;
+                        return true;
+                    }
+                } else {
+                    // The item is a Gtk.TreeListRow containing a Scanner.Results
+                    if (columnview_selection.get_item (i) == item) {
+                        position = i;
                         return true;
                     }
                 }
+            }
 
-                return false;
-            });
-
-            treeview.popup_menu.connect (() => {
-                return show_treeview_popup (treeview_popup_menu, null);
-            });
-
-            treeview_popup_open.activate.connect (() => {
-                Gtk.TreeIter iter;
-                if (get_selected_iter (out iter)) {
-                    open_item (iter);
-                }
-            });
-
-            treeview_popup_copy.activate.connect (() => {
-                Gtk.TreeIter iter;
-                if (get_selected_iter (out iter)) {
-                    copy_path (iter);
-                }
-            });
-
-            treeview_popup_trash.activate.connect (() => {
-                Gtk.TreeIter iter;
-                if (get_selected_iter (out iter)) {
-                    trash_file (iter);
-                }
-            });
-
-            treeview.row_activated.connect ((wrapper_path, column) => {
-                var path = convert_path_to_child_path (wrapper_path);
-                reroot_treeview (path, true);
-            });
-
-            var folder_display_model = (Gtk.TreeSortable) folder_display.model;
-            folder_display_model.sort_column_changed.connect (reset_treeview_sorting);
-
-            folder_display.size_column.notify["width"].connect (copy_treeview_column_sizes);
-            folder_display.contents_column.notify["width"].connect (copy_treeview_column_sizes);
-            folder_display.time_modified_column.notify["width"].connect (copy_treeview_column_sizes);
+            return false;
         }
 
-        void copy_treeview_column_sizes () {
-            size_column.min_width = folder_display.size_column.width;
-            contents_column.min_width = folder_display.contents_column.width;
-            time_modified_column.min_width = folder_display.time_modified_column.width;
+        Scanner.Results? get_selected_item () {
+            if (!(columnview_selection.selected_item is Gtk.TreeListRow)) {
+                return null;
+            }
+
+            var row = columnview_selection.selected_item as Gtk.TreeListRow;
+            return row.item as Scanner.Results?;
         }
 
-        void reset_treeview_sorting () {
-            int id;
-            Gtk.SortType sort_type;
-
-            var folder_display_model = (Gtk.TreeSortable) folder_display.model;
-            var treeview_model = (Gtk.TreeSortable) treeview.model;
-
-            folder_display_model.get_sort_column_id (out id, out sort_type);
-            treeview_model.set_sort_column_id (id, sort_type);
+        void on_show_treeview_popover () {
+            show_treeview_popover (treeview_popover_menu,
+                                   columnview.get_allocated_width () / 2,
+                                   columnview.get_allocated_height () / 2);
         }
 
-
-        void reroot_treeview (Gtk.TreePath path, bool select_first = false) {
-            Gtk.TreeIter iter;
-            active_location.scanner.get_iter (out iter, path);
-            if (!active_location.scanner.iter_has_child (iter)) {
+        void on_treeview_expand_row () {
+            var selected_item = columnview_selection.selected_item;
+            if (!(selected_item is Gtk.TreeListRow)) {
                 return;
             }
 
-            rings_chart.root = path;
-            treemap_chart.root = path;
-            folder_display.path = path;
-            pathbar.path = path;
+            var selected_row = selected_item as Gtk.TreeListRow;
+            selected_row.expanded = true;
+        }
 
-            var filter = new Gtk.TreeModelFilter (active_location.scanner, path);
-            treeview.model = new Gtk.TreeModelSort.with_model (filter);
-            reset_treeview_sorting ();
+        void on_treeview_collapse_row () {
+            var selected_item = columnview_selection.selected_item;
+            if (!(selected_item is Gtk.TreeListRow)) {
+                return;
+            }
 
-            if (select_first) {
-                treeview.set_cursor (new Gtk.TreePath.first (), null, false);
+            var selected_row = selected_item as Gtk.TreeListRow;
+            if (selected_row.expanded) {
+                selected_row.expanded = false;
+            } else if (selected_row.depth > 0) {
+                uint position = 0;
+                if (columnview_selection_find (selected_row.get_parent (), false, out position)) {
+                    columnview.scroll_to (position,
+                                          null,
+                                          Gtk.ListScrollFlags.FOCUS | Gtk.ListScrollFlags.SELECT,
+                                          null);
+                }
             }
         }
 
-        void message (string primary_msg, string secondary_msg, Gtk.MessageType type) {
-            infobar.message_type = type;
-            infobar_primary_label.label = "<b>%s</b>".printf (primary_msg);
-            infobar_secondary_label.label = "<small>%s</small>".printf (secondary_msg);
-            infobar.show ();
+        void on_treeview_open_folder () {
+            var item = get_selected_item ();
+            if (item != null)
+                open_item (item);
         }
 
-        void clear_message () {
-            infobar.hide ();
+        void on_treeview_copy () {
+            var item = get_selected_item ();
+            if (item != null)
+                copy_path (item);
+        }
+
+        void on_treeview_trash () {
+            var item = get_selected_item ();
+            if (item != null)
+                trash_file (item);
+        }
+
+        void hide_columnview_header () {
+            // Hack poking into Gtk.ColumnView's internal structure to find the
+            // header row and hide it, nothing guarantees this structure won't
+            // change and this hack works for all GTK 4 version.
+            // In GTK 4.14, the structure is like this:
+            // GtkColumnView
+            // ├── GtkColumnViewRowWidget — header
+            // ╰── GtkColumnListView      — content
+            var row_type = Type.from_name ("GtkColumnViewRowWidget");
+            for (var child = columnview.get_first_child (); child != null; child = child.get_next_sibling ()) {
+                if (child.get_type () != row_type) {
+                    continue;
+                }
+
+                child.visible = false;
+            }
+        }
+
+        [GtkCallback]
+        void treeview_right_click_gesture_pressed (int n_press, double x, double y) {
+            var child = columnview.pick (x, y, Gtk.PickFlags.INSENSITIVE | Gtk.PickFlags.NON_TARGETABLE);
+            var row = child.get_ancestor (Type.from_name ("GtkColumnViewRowWidget"));
+
+            if (row == null) {
+                return;
+            }
+
+            for (var cell = row.get_first_child (); cell != null; cell = cell.get_next_sibling ()) {
+                var cell_content = cell.get_first_child ();
+
+                if (cell_content == null ||
+                    cell_content.get_type () != typeof (FileCell)) {
+                    continue;
+                }
+
+                var file_cell = cell_content as FileCell;
+                uint position = 0;
+
+                if (columnview_selection_find (file_cell.item, true, out position)) {
+                    columnview.scroll_to (position,
+                                          null,
+                                          Gtk.ListScrollFlags.FOCUS | Gtk.ListScrollFlags.SELECT,
+                                          null);
+                }
+                break;
+            }
+
+            show_treeview_popover (treeview_popover_menu,  (int) x, (int) y);
+        }
+
+        [GtkCallback]
+        void columnview_activate (uint position) {
+            var row = columnview.model.get_object (position) as Gtk.TreeListRow;
+            var path = row.item as Scanner.Results;
+            reroot_treeview (path, true);
+        }
+
+        void reroot_treeview (Scanner.Results path, bool select_first = false) {
+            if (path.is_empty) {
+                return;
+            }
+
+            folder_display.path = path;
+            rings_chart.tree_root = path;
+            treemap_chart.tree_root = path;
+            pathbar.path = path;
+
+            columnview_sort_model.model = path.create_tree_model ();
+
+            if (select_first) {
+                columnview_selection.selected = 0;
+            }
+        }
+
+        void toast (string title) {
+            var toast = new Adw.Toast (title);
+            toast_overlay.add_toast (toast);
         }
 
         void set_busy (bool busy) {
-            Gdk.Cursor? cursor = null;
+            Gdk.Cursor? new_cursor = null;
+            is_busy = busy;
 
             if (busy) {
-                cursor = busy_cursor;
-                disable_drop ();
+                new_cursor = busy_cursor;
                 chart_stack_switcher.sensitive = false;
                 spinner_stack.visible_child = spinner;
-                spinner.start ();
                 pathbar.sensitive = false;
             } else {
-                enable_drop ();
-                spinner.stop ();
                 spinner_stack.visible_child = chart_stack;
                 chart_stack_switcher.sensitive = true;
                 pathbar.sensitive = true;
             }
 
-            var window = get_window ();
-            if (window != null) {
-                window.cursor = cursor;
-            }
+            this.cursor = new_cursor;
 
             foreach (ActionState action_state in actions_while_scanning) {
                 var action = lookup_action (action_state.name) as SimpleAction;
@@ -590,27 +563,21 @@ namespace Baobab {
         }
 
         void set_ui_state (Gtk.Widget child, bool busy) {
-            menu_button.visible = (child == home_page);
-            reload_button.visible = (child == result_page);
-            back_button.visible = (child == result_page);
-
             set_busy (busy);
 
-            header_bar.custom_title = null;
             if (child == home_page) {
                 var action = lookup_action ("reload") as SimpleAction;
                 action.set_enabled (false);
-                header_bar.title = _("Devices & Locations");
+                this.title = _("Devices & Locations");
+                nav_view.pop ();
             } else {
                 var action = lookup_action ("reload") as SimpleAction;
                 action.set_enabled (true);
-                header_bar.title = active_location.name;
-                if (child == result_page) {
-                    header_bar.custom_title = pathbar;
+                this.title = active_location.name;
+                if (nav_view.visible_page != result_page) {
+                    nav_view.push_by_tag ("results");
                 }
             }
-
-            main_stack.visible_child = child;
         }
 
         /*void scanner_has_first_row (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
@@ -652,23 +619,20 @@ namespace Baobab {
                 // Handle cancellation silently
                 return;
             } catch (Error e) {
-                var primary = _("Could not scan folder “%s”").printf (scanner.directory.get_parse_name ());
-                message (primary, e.message, Gtk.MessageType.ERROR);
+                warning ("Could not scan folder %s: %s", scanner.directory.get_parse_name (), e.message);
+                toast (_("Could not scan folder"));
                 set_ui_state (home_page, false);
                 return;
             }
 
-            reroot_treeview (new Gtk.TreePath.first ());
+            reroot_treeview (scanner.root);
             set_chart_location (active_location);
             set_ui_state (result_page, false);
 
             // Make sure to update the folder display after the scan
-            folder_display.path = new Gtk.TreePath.first ();
-            copy_treeview_column_sizes ();
+            folder_display.path = scanner.root;
 
-            if (!scanner.show_allocated_size) {
-                message (_("Could not always detect occupied disk sizes."), _("Apparent sizes may be shown instead."), Gtk.MessageType.INFO);
-            }
+            banner.revealed = !scanner.show_allocated_size;
 
             if (!is_active) {
                 var notification = new Notification(_("Scan completed"));
@@ -688,12 +652,12 @@ namespace Baobab {
             // Update the timestamp for GtkRecentManager
             location_list.add_location (location);
 
-            treeview.model = null;
+            columnview_sort_model.model = null;
 
             var scanner = location.scanner;
             scan_completed_handler = scanner.completed.connect (scanner_completed);
 
-            clear_message ();
+            banner.revealed = false;
 
             scanning_progress_id = Timeout.add (500, () => {
                 location.progress ();
@@ -712,13 +676,133 @@ namespace Baobab {
             }
 
             if (info == null || info.get_file_type () != FileType.DIRECTORY) {
-                var primary = _("“%s” is not a valid folder").printf (directory.get_parse_name ());
-                message (primary, _("Could not analyze disk usage."), Gtk.MessageType.ERROR);
+                toast (_("“%s” is not a valid folder").printf (directory.get_parse_name ()));
                 return;
             }
 
             var location = new Location.for_file (directory, flags);
             scan_location (location);
+        }
+
+        [GtkCallback]
+        private void folder_cell_setup (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = new FileCell ();
+            item.child = child;
+            folder_display.folder_size_group.add_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void folder_cell_bind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var row = item.item as Gtk.TreeListRow;
+            var results = row.item as Scanner.Results;
+            var child = item.child as FileCell;
+            child.item = results;
+            child.list_row = row;
+        }
+
+        [GtkCallback]
+        private void folder_cell_unbind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = item.child as FileCell;
+            child.item = null;
+        }
+
+        [GtkCallback]
+        private void folder_cell_teardown (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            folder_display.folder_size_group.remove_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void size_cell_setup (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = new SizeCell ();
+            item.child = child;
+            folder_display.size_size_group.add_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void size_cell_bind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var row = item.item as Gtk.TreeListRow;
+            var results = row.item as Scanner.Results;
+            var child = item.child as SizeCell;
+            child.item = results;
+        }
+
+        [GtkCallback]
+        private void size_cell_unbind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = item.child as SizeCell;
+            child.item = null;
+        }
+
+        [GtkCallback]
+        private void size_cell_teardown (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            folder_display.size_size_group.remove_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void contents_cell_setup (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = new ContentsCell ();
+            item.child = child;
+            folder_display.contents_size_group.add_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void contents_cell_bind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var row = item.item as Gtk.TreeListRow;
+            var results = row.item as Scanner.Results;
+            var child = item.child as ContentsCell;
+            child.item = results;
+        }
+
+        [GtkCallback]
+        private void contents_cell_unbind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = item.child as ContentsCell;
+            child.item = null;
+        }
+
+        [GtkCallback]
+        private void contents_cell_teardown (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            folder_display.contents_size_group.remove_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void time_modified_cell_setup (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = new TimeModifiedCell ();
+            item.child = child;
+            folder_display.time_modified_size_group.add_widget (item.child);
+        }
+
+        [GtkCallback]
+        private void time_modified_cell_bind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var row = item.item as Gtk.TreeListRow;
+            var results = row.item as Scanner.Results;
+            var child = item.child as TimeModifiedCell;
+            child.item = results;
+        }
+
+        [GtkCallback]
+        private void time_modified_cell_unbind (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            var child = item.child as TimeModifiedCell;
+            child.item = null;
+        }
+
+        [GtkCallback]
+        private void time_modified_cell_teardown (GLib.Object object) {
+            var item = object as Gtk.ColumnViewCell;
+            folder_display.time_modified_size_group.remove_widget (item.child);
         }
     }
 }
